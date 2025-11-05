@@ -1,8 +1,6 @@
-// Settings Management
 class SettingsManager {
     constructor() {
         this.defaults = {
-            // Appearance
             theme: 'dark',
             accentColor: '#a855f7',
             controlStyle: 'modern',
@@ -13,19 +11,16 @@ class SettingsManager {
             animationsEnabled: true,
             uiDensity: 'comfortable', // compact, comfortable, spacious
 
-            // Playback
             defaultVolume: 70,
             rememberPosition: true,
             autoPlay: false,
             smoothSeeking: true,
 
-            // Behavior
             doubleClickAction: 'fullscreen',
             mouseWheelAction: 'volume',
             showTooltips: true,
             tooltipPosition: 'smart', // smart, above, below
 
-            // Advanced
             keyboardShortcuts: true,
             loopPlaylist: true,
             shuffleMode: false,
@@ -66,7 +61,6 @@ class SettingsManager {
     }
 
     applySettings() {
-        // Apply theme
         document.body.classList.remove('dark-theme', 'light-theme', 'system-theme');
         const theme = this.settings.theme;
         if (theme === 'light') {
@@ -75,38 +69,29 @@ class SettingsManager {
             document.body.classList.add('system-theme');
         }
 
-        // Apply accent color with brightness adjustments
         document.documentElement.style.setProperty('--accent', this.settings.accentColor);
         const lighter = this.lightenColor(this.settings.accentColor, 15);
         const darker = this.darkenColor(this.settings.accentColor, 15);
         document.documentElement.style.setProperty('--accent-light', lighter);
         document.documentElement.style.setProperty('--accent-hover', darker);
 
-        // Apply control opacity
         document.documentElement.style.setProperty('--control-opacity', this.settings.controlOpacity);
 
-        // Apply backdrop blur
         document.documentElement.style.setProperty('--backdrop-blur',
             this.settings.backdropBlur ? '1' : '0');
 
-        // Apply overlay blur
         document.documentElement.style.setProperty('--overlay-blur', this.settings.overlayBlur);
 
-        // Apply animations
         document.documentElement.style.setProperty('--animations-enabled',
             this.settings.animationsEnabled ? '1' : '0');
 
-        // Apply UI density
         document.documentElement.style.setProperty('--ui-density', this.settings.uiDensity);
 
-        // Apply auto-hide controls
         document.documentElement.style.setProperty('--auto-hide-controls',
             this.settings.autoHideControls ? '1' : '0');
 
-        // Apply tooltip position
         document.documentElement.style.setProperty('--tooltip-position', this.settings.tooltipPosition);
 
-        // Apply show controls on hover
         document.documentElement.style.setProperty('--show-controls-on-hover',
             this.settings.showControlsOnHover ? '1' : '0');
     }
@@ -118,7 +103,6 @@ class SettingsManager {
     }
 
     updateUI() {
-        // Appearance Settings
         const themeSelect = document.getElementById('theme-select');
         const accentColor = document.getElementById('accent-color');
         const accentValue = document.getElementById('accent-color-value');
@@ -149,7 +133,6 @@ class SettingsManager {
         if (autoHideControls) autoHideControls.checked = this.settings.autoHideControls;
         if (animationsEnabled) animationsEnabled.checked = this.settings.animationsEnabled;
 
-        // Playback Settings
         const defaultVolume = document.getElementById('default-volume');
         const defaultVolumeValue = document.getElementById('default-volume-value');
         const rememberPosition = document.getElementById('remember-position');
@@ -164,7 +147,6 @@ class SettingsManager {
         if (autoPlay) autoPlay.checked = this.settings.autoPlay;
         if (smoothSeeking) smoothSeeking.checked = this.settings.smoothSeeking;
 
-        // Behavior Settings
         const doubleClickAction = document.getElementById('double-click-action');
         const mouseWheelAction = document.getElementById('mouse-wheel-action');
         const showTooltips = document.getElementById('show-tooltips');
@@ -173,7 +155,6 @@ class SettingsManager {
         if (mouseWheelAction) mouseWheelAction.value = this.settings.mouseWheelAction;
         if (showTooltips) showTooltips.checked = this.settings.showTooltips;
 
-        // Advanced Settings
         const keyboardShortcuts = document.getElementById('keyboard-shortcuts');
         const loopPlaylist = document.getElementById('loop-playlist');
         const shuffleMode = document.getElementById('shuffle-mode');
@@ -184,7 +165,6 @@ class SettingsManager {
     }
 
     setupEventListeners() {
-        // Appearance
         document.getElementById('theme-select')?.addEventListener('change', (e) => {
             this.setSetting('theme', e.target.value);
         });
@@ -230,7 +210,6 @@ class SettingsManager {
             document.documentElement.style.setProperty('--animations-enabled', e.target.checked ? '1' : '0');
         });
 
-        // Playback
         document.getElementById('default-volume')?.addEventListener('input', (e) => {
             const value = e.target.value;
             this.setSetting('defaultVolume', parseInt(value));
@@ -250,7 +229,6 @@ class SettingsManager {
             this.setSetting('smoothSeeking', e.target.checked);
         });
 
-        // Behavior
         document.getElementById('double-click-action')?.addEventListener('change', (e) => {
             this.setSetting('doubleClickAction', e.target.value);
         });
@@ -271,7 +249,6 @@ class SettingsManager {
             this.setSetting('showControlsOnHover', e.target.checked);
         });
 
-        // Advanced
         document.getElementById('keyboard-shortcuts')?.addEventListener('change', (e) => {
             this.setSetting('keyboardShortcuts', e.target.checked);
         });
@@ -308,10 +285,8 @@ class SettingsManager {
     }
 }
 
-// Initialize settings globally
 window.settingsManager = new SettingsManager();
 
-// Wait for DOM and apply settings
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         window.settingsManager.applySettings();
