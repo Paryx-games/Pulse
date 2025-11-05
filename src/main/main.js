@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 
 let app, BrowserWindow, ipcMain;
 
@@ -69,6 +70,17 @@ ipcMain.on('close-window', () => {
 ipcMain.handle('get-maximize-state', () => {
     if (mainWindow) return mainWindow.isMaximized();
     return false;
+});
+
+ipcMain.handle('get-version', () => {
+    try {
+        const versionFile = path.join(__dirname, '../../version.txt');
+        const version = fs.readFileSync(versionFile, 'utf8').trim();
+        return version;
+    } catch (error) {
+        console.error('Failed to read version file:', error.message);
+        return 'unknown';
+    }
 });
 
 if (app.isReady && app.isReady()) {

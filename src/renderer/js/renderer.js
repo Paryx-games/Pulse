@@ -63,6 +63,7 @@ if (!window.playerInitialized) {
         setupMouseControl();
         setupSmartTooltips();
         applySettings();
+        loadVersion();
     }
 
 
@@ -608,5 +609,21 @@ if (!window.playerInitialized) {
         const G = Math.max(0, Math.min(255, (num >> 8 & 0x00FF) + amt));
         const B = Math.max(0, Math.min(255, (num & 0x0000FF) + amt));
         return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+    }
+
+    async function loadVersion() {
+        try {
+            const version = await window.electronAPI.getVersion();
+            const versionElement = document.getElementById('app-version');
+            if (versionElement) {
+                versionElement.textContent = version;
+            }
+        } catch (error) {
+            console.error('Failed to load version:', error);
+            const versionElement = document.getElementById('app-version');
+            if (versionElement) {
+                versionElement.textContent = 'unknown';
+            }
+        }
     }
 }
