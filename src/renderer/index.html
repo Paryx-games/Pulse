@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; font-src https://cdnjs.cloudflare.com; connect-src 'self' https://cdn.jsdelivr.net; media-src 'self' blob:">
+    <title>Pulse</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Titlebar -->
+    <div class="titlebar">
+        <div class="titlebar-content">
+            <div class="app-title">
+                <i class="fas fa-pulse"></i>
+                <span>Pulse</span>
+            </div>
+            <div class="titlebar-buttons">
+                <button class="titlebar-btn" id="minimize-btn" title="Minimize">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="titlebar-btn" id="maximize-btn" title="Maximize">
+                    <i class="fas fa-square"></i>
+                </button>
+                <button class="titlebar-btn close-btn" id="close-btn" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="player-wrapper">
+            <!-- Video Player -->
+            <video id="video-player" class="video-player"></video>
+
+            <!-- Loading State -->
+            <div class="loading-state" id="loading-state">
+                <div class="loading-spinner">
+                    <div class="spinner-dot"></div>
+                </div>
+                <p class="loading-text">Processing video...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="empty-state">
+                <div class="empty-content">
+                    <div class="empty-icon">
+                        <i class="fas fa-film"></i>
+                    </div>
+                    <h2>No Media Loaded</h2>
+                    <p>Drop a video or audio file here, or click to browse</p>
+                    <button class="btn btn-primary" id="empty-load-btn">
+                        <i class="fas fa-plus"></i>
+                        Open File
+                    </button>
+                </div>
+            </div>
+
+            <!-- Info Bar (Top) -->
+            <div class="info-bar">
+                <div class="file-info">
+                    <span id="file-name" class="file-name">No file loaded</span>
+                </div>
+                <div class="info-actions">
+                    <button class="icon-btn" id="info-btn" title="Media Info">
+                        <i class="fas fa-circle-info"></i>
+                    </button>
+                    <button class="icon-btn" id="settings-btn" title="Settings">
+                        <i class="fas fa-gear"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Playback Controls Bar (Bottom) -->
+            <div class="playback-controls">
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <input type="range" class="progress-bar" id="progress-bar" min="0" max="100" value="0">
+                    <div class="time-display">
+                        <span id="current-time" class="time">0:00</span>
+                        <span id="total-time" class="time">0:00</span>
+                    </div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="controls-wrapper">
+                    <div class="controls-group primary">
+                        <button class="icon-btn" id="play-btn" title="Play or pause the current file">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="icon-btn" id="stop-btn" title="Stop playback">
+                            <i class="fas fa-stop"></i>
+                        </button>
+                        <button class="icon-btn" id="prev-btn" title="Play previous file in queue">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="icon-btn" id="next-btn" title="Play next file in queue">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="controls-group secondary">
+                        <button class="icon-btn" id="open-file-btn" title="Browse and open a file">
+                            <i class="fas fa-folder-open"></i>
+                        </button>
+                    </div>
+
+                    <div class="controls-group tertiary">
+                        <div class="volume-container">
+                            <button class="icon-btn" id="volume-btn" title="Mute/Unmute audio">
+                                <i class="fas fa-volume-high"></i>
+                            </button>
+                            <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="70"
+                                title="Adjust volume level">
+                        </div>
+                        <button class="icon-btn" id="speed-btn" title="Change playback speed (0.25x - 2.0x)"
+                            data-speed="1">1x</button>
+                        <button class="icon-btn" id="loop-btn" title="Cycle through: No Loop → Loop All → Loop One">
+                            <i class="fas fa-repeat"></i>
+                        </button>
+                        <button class="icon-btn" id="playlist-btn" title="Toggle queue/playlist panel">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <button class="icon-btn" id="fullscreen-btn" title="Enter/Exit fullscreen mode">
+                            <i class="fas fa-maximize"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Playlist Sidebar -->
+            <div class="playlist-sidebar" id="playlist-sidebar">
+                <div class="playlist-header">
+                    <h3>Queue</h3>
+                    <button class="icon-btn" id="close-playlist-btn" title="Close queue panel">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="playlist-content">
+                    <div class="playlist-items" id="playlist-items">
+                        <div class="empty-playlist">
+                            <p>Queue is empty</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Play Button -->
+            <button class="play-overlay" id="center-play-btn" title="Play/Pause">
+                <i class="fas fa-play"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="icon-btn" id="settings-close-btn" title="Close settings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Appearance -->
+                <div class="settings-section">
+                    <h3>Appearance</h3>
+                    <div class="setting-item">
+                        <label>Theme</label>
+                        <select id="theme-select" class="select-input">
+                            <option value="dark">Dark</option>
+                            <option value="light">Light</option>
+                            <option value="system">System</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Accent Color</label>
+                        <div class="color-picker-container">
+                            <input type="color" id="accent-color" class="color-picker" value="#a855f7">
+                            <span id="accent-color-value">#a855f7</span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label title="Adjust spacing and padding of UI elements">UI Density</label>
+                        <select id="ui-density" class="select-input" title="Choose how much space UI elements take up">
+                            <option value="compact">Compact</option>
+                            <option value="comfortable">Comfortable</option>
+                            <option value="spacious">Spacious</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label title="How transparent or opaque the controls appear">Control Opacity</label>
+                        <div class="slider-container">
+                            <input type="range" id="control-opacity" class="slider-input" min="0" max="100" value="80"
+                                step="5" title="0% = Invisible, 100% = Fully Opaque">
+                            <span class="slider-value" id="control-opacity-value">80%</span>
+                        </div>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="backdrop-blur" class="checkbox-input" checked
+                            title="Apply blur effect to backgrounds behind modals">
+                        <label for="backdrop-blur">Backdrop Blur</label>
+                    </div>
+                    <div class="setting-item">
+                        <label>Overlay Blur Intensity</label>
+                        <div class="slider-container">
+                            <input type="range" id="overlay-blur" class="slider-input" min="0" max="100" value="100"
+                                step="10" title="Control how much the modal background is blurred">
+                            <span class="slider-value" id="overlay-blur-value">100%</span>
+                        </div>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="auto-hide-controls" class="checkbox-input" checked>
+                        <label for="auto-hide-controls">Auto-hide Controls</label>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="animations-enabled" class="checkbox-input" checked
+                            title="Enable/disable all UI animations">
+                        <label for="animations-enabled">Enable Animations</label>
+                    </div>
+                </div>
+
+                <!-- Playback -->
+                <div class="settings-section">
+                    <h3>Playback</h3>
+                    <div class="setting-item">
+                        <label>Default Volume</label>
+                        <div class="slider-container">
+                            <input type="range" id="default-volume" class="slider-input" min="0" max="100" value="70">
+                            <span class="slider-value" id="default-volume-value">70%</span>
+                        </div>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="remember-position" class="checkbox-input" checked>
+                        <label for="remember-position">Remember Playback Position</label>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="auto-play" class="checkbox-input">
+                        <label for="auto-play">Auto-play Next Item</label>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="smooth-seeking" class="checkbox-input" checked>
+                        <label for="smooth-seeking">Smooth Seeking</label>
+                    </div>
+                </div>
+
+                <!-- Player Behavior -->
+                <div class="settings-section">
+                    <h3>Behavior</h3>
+                    <div class="setting-item">
+                        <label>Double-click Action</label>
+                        <select id="double-click-action" class="select-input">
+                            <option value="fullscreen">Toggle Fullscreen</option>
+                            <option value="play-pause">Play/Pause</option>
+                            <option value="mute">Mute/Unmute</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Mouse Wheel</label>
+                        <select id="mouse-wheel-action" class="select-input">
+                            <option value="volume">Adjust Volume</option>
+                            <option value="seek">Seek</option>
+                            <option value="disabled">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="show-tooltips" class="checkbox-input" checked
+                            title="Display helpful text when hovering over buttons">
+                        <label for="show-tooltips" title="Display helpful text when hovering over buttons">Show Button
+                            Tooltips</label>
+                    </div>
+                    <div class="setting-item">
+                        <label title="Choose where tooltips appear relative to buttons">Tooltip Position</label>
+                        <select id="tooltip-position" class="select-input"
+                            title="Smart = above/below based on space, Fixed = always in one direction">
+                            <option value="smart">Smart (Auto)</option>
+                            <option value="above">Always Above</option>
+                            <option value="below">Always Below</option>
+                        </select>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="show-controls-on-hover" class="checkbox-input" checked
+                            title="Show controls only when mouse hovers over player">
+                        <label for="show-controls-on-hover"
+                            title="Show controls only when mouse hovers over player">Show Controls on Hover</label>
+                    </div>
+                </div>
+
+                <!-- Advanced -->
+                <div class="settings-section">
+                    <h3>Advanced</h3>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="keyboard-shortcuts" class="checkbox-input" checked>
+                        <label for="keyboard-shortcuts">Keyboard Shortcuts Enabled</label>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="loop-playlist" class="checkbox-input" checked>
+                        <label for="loop-playlist">Loop Playlist</label>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="shuffle-mode" class="checkbox-input">
+                        <label for="shuffle-mode">Shuffle Mode</label>
+                    </div>
+                    <div class="setting-item">
+                        <button class="btn btn-secondary" id="reset-settings-btn"
+                            title="Restore all settings to their default values">Reset to Default</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="modal" id="info-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Media Information</h2>
+                <button class="icon-btn" id="info-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="media-info-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden File Input -->
+    <input type="file" id="file-input" accept="video/*,audio/*" style="display: none;">
+
+    <!-- Scripts -->
+    <script src="js/titlebar.js"></script>
+    <script src="js/contextMenu.js"></script>
+    <script src="js/ffmpegWorker.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/renderer.js"></script>
+</body>
+
+</html>
