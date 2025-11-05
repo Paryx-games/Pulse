@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Dist
+dist/
+out/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.sublime-workspace
+*.sublime-project
+
+# Temporary files
+.cache/
+.parcel-cache/
+.next/
+out/
+
+# OS specific
+.AppleDouble
+.LSOverride
+ehthumbs.db
+Desktop.ini
+
+# Electron
+electron-builder-config.json

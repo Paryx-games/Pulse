@@ -1,0 +1,35 @@
+* text=auto eol=lf
+
+# Text files
+*.md text eol=lf
+*.txt text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+
+# Windows batch scripts
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.mov binary
+*.mp4 binary
+*.mp3 binary
+*.wav binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+
+# Git files
+.gitattributes text merge=union
+.gitignore text
