@@ -1,7 +1,7 @@
 if (!window.playerInitialized) {
     window.playerInitialized = true;
 
-    // ========== DOM Elements ==========
+
     const videoPlayer = document.getElementById('video-player');
     const playBtn = document.getElementById('play-btn');
     const stopBtn = document.getElementById('stop-btn');
@@ -35,7 +35,7 @@ if (!window.playerInitialized) {
     const infoBar = document.querySelector('.info-bar');
     const playbackControls = document.querySelector('.playback-controls');
 
-    // ========== State ==========
+
     let playlist = [];
     let currentIndex = 0;
     let isPlaying = false;
@@ -47,7 +47,7 @@ if (!window.playerInitialized) {
     let hideControlsTimeout = null;
     let mouseMoveTimeout = null;
 
-    // ========== Initialization ==========
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initializePlayer);
     } else {
@@ -65,33 +65,26 @@ if (!window.playerInitialized) {
         applySettings();
     }
 
-    // ========== Event Listeners ==========
+
     function setupEventListeners() {
-        // Play/Pause
         playBtn.addEventListener('click', togglePlayPause);
         centerPlayBtn.addEventListener('click', togglePlayPause);
         videoPlayer.addEventListener('dblclick', handleDoublClick);
 
-        // Stop
         stopBtn.addEventListener('click', stopVideo);
 
-        // Navigation
         prevBtn.addEventListener('click', playPrevious);
         nextBtn.addEventListener('click', playNext);
 
-        // File operations
         openFileBtn.addEventListener('click', () => fileInput.click());
         emptyLoadBtn.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', handleFileSelect);
 
-        // Seek
         progressBar.addEventListener('input', seekVideo);
 
-        // Volume
         volumeSlider.addEventListener('input', updateVolume);
         volumeBtn.addEventListener('click', toggleMute);
 
-        // Video events
         videoPlayer.addEventListener('timeupdate', updateProgress);
         videoPlayer.addEventListener('loadedmetadata', updateTotalTime);
         videoPlayer.addEventListener('play', () => {
@@ -104,36 +97,27 @@ if (!window.playerInitialized) {
         });
         videoPlayer.addEventListener('ended', handleVideoEnd);
 
-        // Fullscreen
         fullscreenBtn.addEventListener('click', toggleFullscreen);
 
-        // Playlist
         playlistBtn.addEventListener('click', togglePlaylist);
         closePlaylistBtn.addEventListener('click', () => playlistSidebar.classList.remove('active'));
 
-        // Settings
         settingsBtn.addEventListener('click', openSettings);
         settingsCloseBtn.addEventListener('click', closeSettings);
 
-        // Info
         infoBtn.addEventListener('click', openInfo);
         infoCloseBtn.addEventListener('click', closeInfo);
 
-        // Loop
         loopBtn.addEventListener('click', toggleLoop);
 
-        // Speed
         speedBtn.addEventListener('click', changeSpeed);
 
-        // Keyboard
         document.addEventListener('keydown', handleKeyboard);
 
-        // Drag & Drop
         playerWrapper.addEventListener('dragover', handleDragOver);
         playerWrapper.addEventListener('dragleave', handleDragLeave);
         playerWrapper.addEventListener('drop', handleDrop);
 
-        // Modal overlays
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', (e) => {
                 if (e.target === overlay) {
@@ -167,18 +151,16 @@ if (!window.playerInitialized) {
     }
 
     function setupSmartTooltips() {
-        // Setup smart tooltip positioning (up/down based on position)
+
         document.querySelectorAll('[title]').forEach(btn => {
             btn.addEventListener('mouseenter', function () {
                 const rect = this.getBoundingClientRect();
 
-                // Determine if tooltip should be above or below
                 const spaceAbove = rect.top;
                 const spaceBelow = window.innerHeight - rect.bottom;
                 const tooltipHeight = 40;
                 const threshold = 120;
 
-                // If less than threshold px space above, show below
                 if (spaceAbove < threshold) {
                     this.setAttribute('data-tooltip-position', 'below');
                 } else {
@@ -187,7 +169,7 @@ if (!window.playerInitialized) {
             });
         });
 
-        // Create style for dynamic tooltip positioning
+
         const style = document.createElement('style');
         style.textContent = `
             .icon-btn[data-tooltip-position="below"][title]:hover::after {
@@ -205,7 +187,7 @@ if (!window.playerInitialized) {
         document.head.appendChild(style);
     }
 
-    // ========== Playback Control ==========
+
     function togglePlayPause() {
         if (!videoPlayer.src) return;
         if (isPlaying) {
@@ -266,7 +248,7 @@ if (!window.playerInitialized) {
         speedBtn.setAttribute('data-speed', speed);
     }
 
-    // ========== Volume Control ==========
+
     function setDefaultVolume() {
         const defaultVol = window.settingsManager.getSetting('defaultVolume');
         volumeSlider.value = defaultVol;
@@ -312,7 +294,7 @@ if (!window.playerInitialized) {
         updateVolume();
     }
 
-    // ========== Seeking ==========
+
     function seekVideo() {
         const percent = progressBar.value;
         videoPlayer.currentTime = (percent / 100) * videoPlayer.duration;
@@ -347,7 +329,6 @@ if (!window.playerInitialized) {
         return `${minutes}:${String(secs).padStart(2, '0')}`;
     }
 
-    // ========== File Management ==========
     function handleFileSelect(e) {
         const files = Array.from(e.target.files);
         files.forEach(file => addToPlaylist(file));
@@ -436,14 +417,14 @@ if (!window.playerInitialized) {
         try {
             const saved = localStorage.getItem('pulsePlaylist');
             if (saved && saved !== '[]') {
-                // URLs are temporary blob URLs, just confirm playlist existed
+
             }
         } catch (e) {
             console.warn('Could not load playlist:', e);
         }
     }
 
-    // ========== UI Updates ==========
+
     function updatePlayButtonState() {
         const icon = isPlaying ? 'fas fa-pause' : 'fas fa-play';
         playBtn.innerHTML = `<i class="${icon}"></i>`;
@@ -458,7 +439,7 @@ if (!window.playerInitialized) {
         emptyState.classList.remove('active');
     }
 
-    // ========== Settings & Info ==========
+
     function openSettings() {
         settingsModal.classList.add('active');
     }
@@ -514,7 +495,7 @@ if (!window.playerInitialized) {
         content.innerHTML = info;
     }
 
-    // ========== Fullscreen ==========
+
     function toggleFullscreen() {
         if (!document.fullscreenElement) {
             playerWrapper.requestFullscreen().catch(err => {
@@ -525,7 +506,7 @@ if (!window.playerInitialized) {
         }
     }
 
-    // ========== Keyboard & Mouse ==========
+
     function handleKeyboard(e) {
         if (document.activeElement.tagName === 'INPUT') return;
         const keyboardEnabled = window.settingsManager.getSetting('keyboardShortcuts');
@@ -603,7 +584,7 @@ if (!window.playerInitialized) {
         }
     }
 
-    // ========== Settings Application ==========
+
     function applySettings() {
         const theme = window.settingsManager.getSetting('theme');
         if (theme === 'light') {
