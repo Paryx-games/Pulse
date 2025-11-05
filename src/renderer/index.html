@@ -161,16 +161,40 @@
 
     <div class="modal" id="settings-modal">
         <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Settings</h2>
-                <button class="icon-btn" id="settings-close-btn" title="Close settings">
-                    <i class="fas fa-times"></i>
-                </button>
+        <div class="modal-content settings-modal-content">
+            <div class="settings-sidebar">
+                <div class="settings-header">
+                    <h2>Settings</h2>
+                    <button class="icon-btn" id="settings-close-btn" title="Close settings">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="settings-nav">
+                    <button class="settings-tab active" data-tab="appearance">
+                        <i class="fas fa-palette"></i>
+                        <span>Appearance</span>
+                    </button>
+                    <button class="settings-tab" data-tab="playback">
+                        <i class="fas fa-play"></i>
+                        <span>Playback</span>
+                    </button>
+                    <button class="settings-tab" data-tab="behavior">
+                        <i class="fas fa-mouse"></i>
+                        <span>Behavior</span>
+                    </button>
+                    <button class="settings-tab" data-tab="advanced">
+                        <i class="fas fa-sliders-h"></i>
+                        <span>Advanced</span>
+                    </button>
+                    <button class="settings-tab" data-tab="about">
+                        <i class="fas fa-info-circle"></i>
+                        <span>About</span>
+                    </button>
+                </div>
             </div>
 
-            <div class="modal-body">
-                <div class="settings-section">
+            <div class="settings-content">
+                <div class="settings-section active" data-tab="appearance">
                     <h3>Appearance</h3>
                     <div class="setting-item">
                         <label>Theme</label>
@@ -227,7 +251,7 @@
                     </div>
                 </div>
 
-                <div class="settings-section">
+                <div class="settings-section" data-tab="playback">
                     <h3>Playback</h3>
                     <div class="setting-item">
                         <label>Default Volume</label>
@@ -250,7 +274,7 @@
                     </div>
                 </div>
 
-                <div class="settings-section">
+                <div class="settings-section" data-tab="behavior">
                     <h3>Behavior</h3>
                     <div class="setting-item">
                         <label>Double-click Action</label>
@@ -291,7 +315,7 @@
                     </div>
                 </div>
 
-                <div class="settings-section">
+                <div class="settings-section" data-tab="advanced">
                     <h3>Advanced</h3>
                     <div class="setting-item checkbox">
                         <input type="checkbox" id="keyboard-shortcuts" class="checkbox-input" checked>
@@ -311,7 +335,7 @@
                     </div>
                 </div>
 
-                <div class="settings-section">
+                <div class="settings-section" data-tab="about">
                     <h3>About</h3>
                     <div class="setting-item">
                         <label>Version</label>
