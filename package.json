@@ -7,7 +7,7 @@
     "scripts": {
         "start": "electron .",
         "dev": "set NODE_ENV=development && electron .",
-        "build": "echo Building..."
+        "build": "electron-builder"
     },
     "keywords": [
         "media-player",
@@ -23,6 +23,32 @@
         "electron": "^39.0.0"
     },
     "devDependencies": {
+        "electron-builder": "^26.0.12",
         "electron-packager": "^17.1.2"
+    },
+    "build": {
+        "appId": "com.pulsemedia.app",
+        "productName": "Pulse Media",
+        "directories": {
+            "output": "dist"
+        },
+        "files": [
+            "dist-electron/**/*",
+            "src/**/*",
+            "index.html",
+            "main.js",
+            "package.json"
+        ],
+        "win": {
+            "target": [
+                "nsis",
+                "msi"
+            ],
+            "icon": "assets/icon/pulse.ico"
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true
+        }
     }
 }
