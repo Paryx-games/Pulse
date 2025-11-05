@@ -76,6 +76,7 @@ if (!window.playerInitialized) {
         setupSmartTooltips();
         applySettings();
         loadVersion();
+        setupVisualizer();
         console.log('Player initialization complete');
     }
 
@@ -681,6 +682,131 @@ if (!window.playerInitialized) {
         isShuffle = !isShuffle;
         shuffleBtn.classList.toggle('active', isShuffle);
         console.log('Shuffle mode:', isShuffle ? 'ON' : 'OFF');
+    }
+
+    let audioContext = null;
+    let analyser = null;
+    let dataArray = null;
+    let animationId = null;
+    let smoothedBars = [];
+    let isAudioOnly = false;
+
+    function isMediaAudioOnly() {
+        return videoPlayer.videoTracks && videoPlayer.videoTracks.length === 0;
+    }
+
+    function setupVisualizer() {
+        const canvas = document.getElementById('visualizer-canvas');
+        const container = document.getElementById('visualizer-container');
+        
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        const bars = 40;
+        smoothedBars = new Array(bars).fill(0);
+
+        function initAudioContext() {
+            if (audioContext) return;
+            
+            try {
+                const audioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioContext = new audioContextClass();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 512;
+                analyser.smoothingTimeConstant = 0.7;
+                
+                const source = audioContext.createMediaElementAudioSource(videoPlayer);
+                source.connect(analyser);
+                analyser.connect(audioContext.destination);
+                
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+            } catch (e) {
+                console.warn('Audio context error:', e);
+            }
+        }
+
+        function drawVisualizer() {
+            if (!analyser || !dataArray || !isAudioOnly) return;
+
+            analyser.getByteFrequencyData(dataArray);
+            
+            const barWidth = (canvas.width - (bars * 1.5)) / bars;
+            const gap = 1.5;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < bars; i++) {
+                const index = Math.floor((i / bars) * (dataArray.length * 0.8));
+                const value = dataArray[index] / 255;
+                const boost = 1 + Math.sin(Date.now() / 200 + i * 0.2) * 0.15;
+                
+                smoothedBars[i] = smoothedBars[i] * 0.7 + value * 0.3;
+                const targetHeight = smoothedBars[i] * boost * canvas.height * 0.95;
+                
+                const barHeight = targetHeight;
+                const x = i * (barWidth + gap);
+                const y = canvas.height - barHeight;
+
+                const hue = (i / bars) * 280 + 200;
+                const saturation = 60 + smoothedBars[i] * 40;
+                const lightness = 50 + smoothedBars[i] * 20;
+                
+                const gradient = ctx.createLinearGradient(0, y, 0, canvas.height);
+                gradient.addColorStop(0, `hsl(${hue}, ${saturation}%, ${lightness}%)`);
+                gradient.addColorStop(1, `hsl(${hue}, ${saturation}%, ${Math.max(30, lightness - 20)}%)`);
+                
+                ctx.fillStyle = gradient;
+                ctx.shadowColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+                ctx.shadowBlur = 8;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 2;
+                
+                ctx.fillRect(x, y, barWidth, barHeight);
+                
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
+                ctx.lineWidth = 1;
+                ctx.strokeRect(x, y, barWidth, barHeight);
+            }
+
+            if (isPlaying && isAudioOnly) {
+                animationId = requestAnimationFrame(drawVisualizer);
+            }
+        }
+
+        videoPlayer.addEventListener('play', () => {
+            isAudioOnly = isMediaAudioOnly();
+            
+            if (isAudioOnly) {
+                if (!audioContext) {
+                    initAudioContext();
+                }
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                container.classList.add('active');
+                drawVisualizer();
+            }
+        });
+
+        videoPlayer.addEventListener('loadedmetadata', () => {
+            isAudioOnly = isMediaAudioOnly();
+        });
+
+        videoPlayer.addEventListener('pause', () => {
+            container.classList.remove('active');
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        });
     }
 
     async function loadVersion() {
