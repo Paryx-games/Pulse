@@ -12,7 +12,6 @@
 </head>
 
 <body>
-    <!-- Titlebar -->
     <div class="titlebar">
         <div class="titlebar-content">
             <div class="app-title">
@@ -33,13 +32,10 @@
         </div>
     </div>
 
-    <!-- Main Container -->
     <div class="container">
         <div class="player-wrapper">
-            <!-- Video Player -->
             <video id="video-player" class="video-player"></video>
 
-            <!-- Loading State -->
             <div class="loading-state" id="loading-state">
                 <div class="loading-spinner">
                     <div class="spinner-dot"></div>
@@ -47,7 +43,6 @@
                 <p class="loading-text">Processing video...</p>
             </div>
 
-            <!-- Empty State -->
             <div class="empty-state" id="empty-state">
                 <div class="empty-content">
                     <div class="empty-icon">
@@ -62,7 +57,6 @@
                 </div>
             </div>
 
-            <!-- Info Bar (Top) -->
             <div class="info-bar">
                 <div class="file-info">
                     <span id="file-name" class="file-name">No file loaded</span>
@@ -77,9 +71,7 @@
                 </div>
             </div>
 
-            <!-- Playback Controls Bar (Bottom) -->
             <div class="playback-controls">
-                <!-- Progress Bar -->
                 <div class="progress-container">
                     <input type="range" class="progress-bar" id="progress-bar" min="0" max="100" value="0">
                     <div class="time-display">
@@ -88,7 +80,6 @@
                     </div>
                 </div>
 
-                <!-- Control Buttons -->
                 <div class="controls-wrapper">
                     <div class="controls-group primary">
                         <button class="icon-btn" id="play-btn" title="Play or pause the current file">
@@ -97,11 +88,17 @@
                         <button class="icon-btn" id="stop-btn" title="Stop playback">
                             <i class="fas fa-stop"></i>
                         </button>
+                        <button class="icon-btn" id="rewind-btn" title="Skip backward 10 seconds">
+                            <i class="fas fa-redo"></i>
+                        </button>
                         <button class="icon-btn" id="prev-btn" title="Play previous file in queue">
                             <i class="fas fa-chevron-left"></i>
                         </button>
                         <button class="icon-btn" id="next-btn" title="Play next file in queue">
                             <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="icon-btn" id="forward-btn" title="Skip forward 10 seconds">
+                            <i class="fas fa-redo"></i>
                         </button>
                     </div>
 
@@ -124,6 +121,12 @@
                         <button class="icon-btn" id="loop-btn" title="Cycle through: No Loop → Loop All → Loop One">
                             <i class="fas fa-repeat"></i>
                         </button>
+                        <button class="icon-btn" id="shuffle-btn" title="Toggle shuffle mode">
+                            <i class="fas fa-random"></i>
+                        </button>
+                        <button class="icon-btn" id="pip-btn" title="Picture-in-picture mode">
+                            <i class="fas fa-clone"></i>
+                        </button>
                         <button class="icon-btn" id="playlist-btn" title="Toggle queue/playlist panel">
                             <i class="fas fa-bars"></i>
                         </button>
@@ -134,7 +137,6 @@
                 </div>
             </div>
 
-            <!-- Playlist Sidebar -->
             <div class="playlist-sidebar" id="playlist-sidebar">
                 <div class="playlist-header">
                     <h3>Queue</h3>
@@ -151,14 +153,12 @@
                 </div>
             </div>
 
-            <!-- Center Play Button -->
             <button class="play-overlay" id="center-play-btn" title="Play/Pause">
                 <i class="fas fa-play"></i>
             </button>
         </div>
     </div>
 
-    <!-- Settings Modal -->
     <div class="modal" id="settings-modal">
         <div class="modal-overlay"></div>
         <div class="modal-content">
@@ -170,7 +170,6 @@
             </div>
 
             <div class="modal-body">
-                <!-- Appearance -->
                 <div class="settings-section">
                     <h3>Appearance</h3>
                     <div class="setting-item">
@@ -228,7 +227,6 @@
                     </div>
                 </div>
 
-                <!-- Playback -->
                 <div class="settings-section">
                     <h3>Playback</h3>
                     <div class="setting-item">
@@ -252,7 +250,6 @@
                     </div>
                 </div>
 
-                <!-- Player Behavior -->
                 <div class="settings-section">
                     <h3>Behavior</h3>
                     <div class="setting-item">
@@ -294,7 +291,6 @@
                     </div>
                 </div>
 
-                <!-- Advanced -->
                 <div class="settings-section">
                     <h3>Advanced</h3>
                     <div class="setting-item checkbox">
@@ -315,7 +311,6 @@
                     </div>
                 </div>
 
-                <!-- About -->
                 <div class="settings-section">
                     <h3>About</h3>
                     <div class="setting-item">
@@ -329,7 +324,6 @@
         </div>
     </div>
 
-    <!-- Info Modal -->
     <div class="modal" id="info-modal">
         <div class="modal-overlay"></div>
         <div class="modal-content">
@@ -345,10 +339,8 @@
         </div>
     </div>
 
-    <!-- Hidden File Input -->
     <input type="file" id="file-input" accept="video/*,audio/*" style="display: none;">
 
-    <!-- Scripts -->
     <script src="js/titlebar.js"></script>
     <script src="js/contextMenu.js"></script>
     <script src="js/ffmpegWorker.js"></script>

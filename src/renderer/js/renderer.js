@@ -1,3 +1,9 @@
+function sanitizeNumber(val) {
+    const n = parseInt(val, 10);
+    if (isNaN(n) || n < 0 || n > 100) return '0';
+    return String(n);
+}
+
 if (!window.playerInitialized) {
     window.playerInitialized = true;
 
@@ -5,6 +11,8 @@ if (!window.playerInitialized) {
     const videoPlayer = document.getElementById('video-player');
     const playBtn = document.getElementById('play-btn');
     const stopBtn = document.getElementById('stop-btn');
+    const rewindBtn = document.getElementById('rewind-btn');
+    const forwardBtn = document.getElementById('forward-btn');
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
     const openFileBtn = document.getElementById('open-file-btn');
@@ -15,11 +23,13 @@ if (!window.playerInitialized) {
     const volumeBtn = document.getElementById('volume-btn');
     const fullscreenBtn = document.getElementById('fullscreen-btn');
     const playlistBtn = document.getElementById('playlist-btn');
+    const pipBtn = document.getElementById('pip-btn');
     const settingsBtn = document.getElementById('settings-btn');
     const infoBtn = document.getElementById('info-btn');
     const fileInput = document.getElementById('file-input');
     const centerPlayBtn = document.getElementById('center-play-btn');
     const loopBtn = document.getElementById('loop-btn');
+    const shuffleBtn = document.getElementById('shuffle-btn');
     const speedBtn = document.getElementById('speed-btn');
     const playlistSidebar = document.getElementById('playlist-sidebar');
     const closePlaylistBtn = document.getElementById('close-playlist-btn');
@@ -40,6 +50,7 @@ if (!window.playerInitialized) {
     let currentIndex = 0;
     let isPlaying = false;
     let isLooping = false;
+    let isShuffle = false;
     let playbackSpeeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
     let currentSpeedIndex = 2;
     let previousVolume = 70;
@@ -76,6 +87,9 @@ if (!window.playerInitialized) {
 
         stopBtn.addEventListener('click', stopVideo);
 
+        rewindBtn.addEventListener('click', skipBackward);
+        forwardBtn.addEventListener('click', skipForward);
+
         prevBtn.addEventListener('click', playPrevious);
         nextBtn.addEventListener('click', playNext);
 
@@ -101,9 +115,12 @@ if (!window.playerInitialized) {
         videoPlayer.addEventListener('ended', handleVideoEnd);
 
         fullscreenBtn.addEventListener('click', toggleFullscreen);
+        pipBtn.addEventListener('click', togglePictureInPicture);
 
         playlistBtn.addEventListener('click', togglePlaylist);
         closePlaylistBtn.addEventListener('click', () => playlistSidebar.classList.remove('active'));
+
+        shuffleBtn.addEventListener('click', toggleShuffle);
 
         settingsBtn.addEventListener('click', openSettings);
         settingsCloseBtn.addEventListener('click', closeSettings);
@@ -487,7 +504,7 @@ if (!window.playerInitialized) {
                 </div>
                 <div class="info-item">
                     <label>Volume</label>
-                    <span>${volumeSlider.value}%</span>
+                    <span>${sanitizeNumber(volumeSlider.value)}%</span>
                 </div>
                 <div class="info-item">
                     <label>Status</label>
@@ -611,6 +628,33 @@ if (!window.playerInitialized) {
         const G = Math.max(0, Math.min(255, (num >> 8 & 0x00FF) + amt));
         const B = Math.max(0, Math.min(255, (num & 0x0000FF) + amt));
         return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+    }
+
+    function skipBackward() {
+        if (videoPlayer.currentTime >= 10) {
+            videoPlayer.currentTime -= 10;
+        } else {
+            videoPlayer.currentTime = 0;
+        }
+    }
+
+    function skipForward() {
+        videoPlayer.currentTime = Math.min(videoPlayer.currentTime + 10, videoPlayer.duration);
+    }
+
+    function togglePictureInPicture() {
+        if (document.pictureInPictureElement) {
+            document.exitPictureInPicture().catch(error => console.error('Error exiting PiP:', error));
+        } else {
+            videoPlayer.requestPictureInPicture().catch(error => console.error('Error entering PiP:', error));
+        }
+        pipBtn.classList.toggle('active');
+    }
+
+    function toggleShuffle() {
+        isShuffle = !isShuffle;
+        shuffleBtn.classList.toggle('active', isShuffle);
+        console.log('Shuffle mode:', isShuffle ? 'ON' : 'OFF');
     }
 
     async function loadVersion() {
