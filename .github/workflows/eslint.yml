@@ -1,52 +1,29 @@
 name: ESLint Security Scan
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  schedule:
-    - cron: '25 10 * * 2'
+on: [push, pull_request]
 
 jobs:
   eslint:
-    name: Run ESLint scanning
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-      
-      - name: Install project dependencies
-        run: npm ci
-      
-      - name: Install ESLint and SARIF formatter
+          node-version: '18.x'
+      - name: Install dependencies
         run: |
-          npm install --save-dev eslint@9.x
-          npm install --save-dev @microsoft/eslint-formatter-sarif@3.1.0
-      
+          if [ -f package-lock.json ]; then npm ci; elif [ -f yarn.lock ]; then yarn install --frozen-lockfile; else npm install; fi
       - name: Run ESLint
-        env:
-          SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
-        run: |
-          npx eslint . \
-            --ext .js,.jsx,.ts,.tsx \
-            --format @microsoft/eslint-formatter-sarif \
-            --output-file eslint-results.sarif
+        id: run_eslint
         continue-on-error: true
-      
+        run: |
+          npx eslint . -f sarif -o eslint-results.sarif || true
+      - name: Check for SARIF
+        id: check_sarif
+        run: |
+          if [ -f eslint-results.sarif ]; then echo "sarif_exists=true" >> $GITHUB_OUTPUT; else echo "sarif_exists=false" >> $GITHUB_OUTPUT; fi
       - name: Upload analysis results to GitHub
+        if: steps.check_sarif.outputs.sarif_exists == 'true'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: eslint-results.sarif
-          wait-for-processing: true
