@@ -70,6 +70,13 @@ function writeLog(logLine) {
 }
 
 function initializeLogger() {
+    const latestPath = getLatestLogPath();
+    try {
+        fs.writeFileSync(latestPath, '', 'utf8');
+    } catch (error) {
+        console.error('Failed to clear log file:', error);
+    }
+    
     startTime = Date.now();
     log('INFO', 'Logger initialized');
     logStartupTime();
