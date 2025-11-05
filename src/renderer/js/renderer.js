@@ -119,11 +119,30 @@ if (!window.playerInitialized) {
 
         playlistBtn.addEventListener('click', togglePlaylist);
         closePlaylistBtn.addEventListener('click', () => playlistSidebar.classList.remove('active'));
+        
+        document.addEventListener('click', (e) => {
+            if (playlistSidebar.classList.contains('active') && 
+                !playlistSidebar.contains(e.target) && 
+                e.target !== playlistBtn && 
+                !playlistBtn.contains(e.target)) {
+                playlistSidebar.classList.remove('active');
+            }
+        });
 
         shuffleBtn.addEventListener('click', toggleShuffle);
 
         settingsBtn.addEventListener('click', openSettings);
         settingsCloseBtn.addEventListener('click', closeSettings);
+
+        document.querySelectorAll('.settings-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelector(`[data-tab="${tabName}"].settings-section`)?.classList.add('active');
+            });
+        });
 
         infoBtn.addEventListener('click', openInfo);
         infoCloseBtn.addEventListener('click', closeInfo);
@@ -401,19 +420,23 @@ if (!window.playerInitialized) {
 
     function updatePlaylistUI() {
         const playlistItems = document.getElementById('playlist-items');
+        playlistItems.innerHTML = '';
+        
         if (playlist.length === 0) {
-            playlistItems.innerHTML = '<div class="empty-playlist"><p>Queue is empty</p></div>';
+            const empty = document.createElement('div');
+            empty.className = 'empty-playlist';
+            empty.innerHTML = '<p>Queue is empty</p>';
+            playlistItems.appendChild(empty);
             return;
         }
 
-        playlistItems.innerHTML = playlist.map((item, index) => `
-            <div class="playlist-item ${index === currentIndex ? 'active' : ''}" data-index="${index}">
-                ${item.name}
-            </div>
-        `).join('');
-
-        playlistItems.querySelectorAll('.playlist-item').forEach((el, index) => {
-            el.addEventListener('click', () => loadPlaylistItem(index));
+        playlist.forEach((item, index) => {
+            const itemEl = document.createElement('div');
+            itemEl.className = `playlist-item ${index === currentIndex ? 'active' : ''}`;
+            itemEl.dataset.index = index;
+            itemEl.textContent = item.name;
+            itemEl.addEventListener('click', () => loadPlaylistItem(index));
+            playlistItems.appendChild(itemEl);
         });
     }
 
@@ -479,40 +502,43 @@ if (!window.playerInitialized) {
 
     function updateMediaInfo() {
         const content = document.getElementById('media-info-content');
+        content.innerHTML = '';
+        
         if (!videoPlayer.src) {
-            content.innerHTML = '<p>No media loaded</p>';
+            const p = document.createElement('p');
+            p.textContent = 'No media loaded';
+            content.appendChild(p);
             return;
         }
 
-        const info = `
-            <div class="info-grid">
-                <div class="info-item">
-                    <label>File Name</label>
-                    <span>${fileName.textContent}</span>
-                </div>
-                <div class="info-item">
-                    <label>Duration</label>
-                    <span>${formatTime(videoPlayer.duration)}</span>
-                </div>
-                <div class="info-item">
-                    <label>Current Time</label>
-                    <span>${formatTime(videoPlayer.currentTime)}</span>
-                </div>
-                <div class="info-item">
-                    <label>Playback Speed</label>
-                    <span>${speedBtn.textContent}</span>
-                </div>
-                <div class="info-item">
-                    <label>Volume</label>
-                    <span>${sanitizeNumber(volumeSlider.value)}%</span>
-                </div>
-                <div class="info-item">
-                    <label>Status</label>
-                    <span>${isPlaying ? 'Playing' : 'Paused'}</span>
-                </div>
-            </div>
-        `;
-        content.innerHTML = info;
+        const grid = document.createElement('div');
+        grid.className = 'info-grid';
+
+        const infoData = [
+            { label: 'File Name', value: fileName.textContent },
+            { label: 'Duration', value: formatTime(videoPlayer.duration) },
+            { label: 'Current Time', value: formatTime(videoPlayer.currentTime) },
+            { label: 'Playback Speed', value: speedBtn.textContent },
+            { label: 'Volume', value: `${sanitizeNumber(volumeSlider.value)}%` },
+            { label: 'Status', value: isPlaying ? 'Playing' : 'Paused' }
+        ];
+
+        infoData.forEach(info => {
+            const item = document.createElement('div');
+            item.className = 'info-item';
+            
+            const label = document.createElement('label');
+            label.textContent = info.label;
+            
+            const value = document.createElement('span');
+            value.textContent = info.value;
+            
+            item.appendChild(label);
+            item.appendChild(value);
+            grid.appendChild(item);
+        });
+
+        content.appendChild(grid);
     }
 
 
