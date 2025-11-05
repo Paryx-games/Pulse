@@ -1,3 +1,9 @@
+function sanitizeNumber(val) {
+    const n = parseInt(val, 10);
+    if (isNaN(n) || n < 0 || n > 100) return '0';
+    return String(n);
+}
+
 if (!window.playerInitialized) {
     window.playerInitialized = true;
 
@@ -498,7 +504,7 @@ if (!window.playerInitialized) {
                 </div>
                 <div class="info-item">
                     <label>Volume</label>
-                    <span>${volumeSlider.value}%</span>
+                    <span>${sanitizeNumber(volumeSlider.value)}%</span>
                 </div>
                 <div class="info-item">
                     <label>Status</label>
