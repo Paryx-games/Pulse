@@ -55,6 +55,7 @@ if (!window.playerInitialized) {
     }
 
     function initializePlayer() {
+        console.log('Renderer process initialized');
         setupEventListeners();
         loadPlaylistFromStorage();
         setDefaultVolume();
@@ -64,6 +65,7 @@ if (!window.playerInitialized) {
         setupSmartTooltips();
         applySettings();
         loadVersion();
+        console.log('Player initialization complete');
     }
 
 
