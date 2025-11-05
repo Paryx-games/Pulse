@@ -1,4 +1,5 @@
 @echo off
+echo DEV BUILD
 echo Building Pulse Media...
 npx electron-packager ../ "Pulse Media" --platform=linux --arch=x64 --out=../dist --overwrite
 
