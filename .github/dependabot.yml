@@ -7,6 +7,16 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/"
-    target-branch: "dev"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "03:00"
+    target-branch: "dev"
+    pull-request-branch-name:
+      separator: "/"
+    reviewers:
+      - "paryx"
+    allow:
+      - dependency-type: "all"
+    commit-message:
+      prefix: "chore(deps):"
