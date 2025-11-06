@@ -63,8 +63,8 @@ class UnsupportedFileHandler {
                 <h2 style="color: #ef4444; font-size: 20px; margin-bottom: 8px;">File Not Supported</h2>
                 <p style="color: #999; font-size: 14px; margin-bottom: 12px;">
                     <strong>File:</strong> ${this.escapeHtml(fileName)}<br>
-                    <strong>Format:</strong> ${ext}<br>
-                    <strong>Error:</strong> ${errorMessage}
+                    <strong>Format:</strong> ${this.escapeHtml(ext)}<br>
+                    <strong>Error:</strong> ${this.escapeHtml(errorMessage)}
                 </p>
                 <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 12px; color: #ccc; text-align: left;">
                     <strong>Supported Formats:</strong><br>
