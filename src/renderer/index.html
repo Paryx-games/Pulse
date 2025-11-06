@@ -14,6 +14,9 @@
 <body>
     <div class="titlebar">
         <div class="titlebar-content">
+            <button class="hamburger-btn" id="hamburger-btn" title="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="app-title">
                 <i class="fas fa-pulse"></i>
                 <span>Pulse</span>
@@ -32,7 +35,100 @@
         </div>
     </div>
 
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <nav class="sidebar-nav">
+                <button class="sidebar-item active" data-page="player">
+                    <i class="fas fa-play"></i>
+                    <span>Media Player</span>
+                </button>
+                <button class="sidebar-item" data-page="home">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </button>
+            </nav>
+        </div>
+        <div class="sidebar-footer">
+            <button class="sidebar-overlay-close" id="sidebar-close"></button>
+        </div>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
     <div class="container">
+        <div class="home-page" id="home-page">
+            <div class="home-header">
+                <div class="home-title">
+                    <i class="fas fa-pulse"></i>
+                    <span>Pulse Media</span>
+                </div>
+                <div class="home-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="home-search-input" placeholder="Search files, tags, or collections...">
+                </div>
+            </div>
+
+            <div class="home-tabs">
+                <button class="home-tab active" data-tab="browse">
+                    <i class="fas fa-folder"></i>
+                    <span>Browse</span>
+                </button>
+                <button class="home-tab" data-tab="favorites">
+                    <i class="fas fa-star"></i>
+                    <span>Favorites</span>
+                </button>
+                <button class="home-tab" data-tab="recent">
+                    <i class="fas fa-history"></i>
+                    <span>Recent</span>
+                </button>
+                <button class="home-tab" data-tab="collections">
+                    <i class="fas fa-tags"></i>
+                    <span>Collections</span>
+                </button>
+            </div>
+
+            <div class="home-content">
+                <div class="home-section active" data-tab="browse">
+                    <div class="browse-controls">
+                        <button class="btn btn-secondary" id="home-add-folder-btn">
+                            <i class="fas fa-plus"></i>
+                            Add Folder
+                        </button>
+                        <div class="breadcrumb" id="breadcrumb">
+                            <span class="breadcrumb-item" data-path="">Home</span>
+                        </div>
+                    </div>
+                    <div class="file-grid" id="browse-grid">
+                        <div class="empty-message">Select a folder to browse</div>
+                    </div>
+                </div>
+
+                <div class="home-section" data-tab="favorites">
+                    <div class="favorites-grid" id="favorites-grid">
+                        <div class="empty-message">No favorites yet. Click the star icon on any file to add it.</div>
+                    </div>
+                </div>
+
+                <div class="home-section" data-tab="recent">
+                    <div class="recent-grid" id="recent-grid">
+                        <div class="empty-message">No recently played files</div>
+                    </div>
+                </div>
+
+                <div class="home-section" data-tab="collections">
+                    <div class="collections-container">
+                        <button class="btn btn-primary" id="create-collection-btn">
+                            <i class="fas fa-plus"></i>
+                            Create Collection
+                        </button>
+                        <div class="collections-list" id="collections-list">
+                            <div class="empty-message">No collections yet</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="player-wrapper">
             <video id="video-player" class="video-player"></video>
 
@@ -106,12 +202,6 @@
                     </div>
 
                     <div class="controls-group secondary">
-                        <button class="icon-btn" id="open-file-btn" title="Browse and open a file">
-                            <i class="fas fa-folder-open"></i>
-                        </button>
-                    </div>
-
-                    <div class="controls-group tertiary">
                         <div class="volume-container">
                             <button class="icon-btn" id="volume-btn" title="Mute/Unmute audio">
                                 <i class="fas fa-volume-high"></i>
@@ -119,23 +209,61 @@
                             <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="70"
                                 title="Adjust volume level">
                         </div>
-                        <button class="icon-btn" id="speed-btn" title="Change playback speed (0.25x - 2.0x)"
-                            data-speed="1">1x</button>
-                        <button class="icon-btn" id="loop-btn" title="Cycle through: No Loop → Loop All → Loop One">
-                            <i class="fas fa-repeat"></i>
-                        </button>
-                        <button class="icon-btn" id="shuffle-btn" title="Toggle shuffle mode">
-                            <i class="fas fa-random"></i>
-                        </button>
-                        <button class="icon-btn" id="pip-btn" title="Picture-in-picture mode">
-                            <i class="fas fa-clone"></i>
-                        </button>
-                        <button class="icon-btn" id="playlist-btn" title="Toggle queue/playlist panel">
-                            <i class="fas fa-bars"></i>
-                        </button>
                         <button class="icon-btn" id="fullscreen-btn" title="Enter/Exit fullscreen mode">
                             <i class="fas fa-maximize"></i>
                         </button>
+                    </div>
+
+                    <div class="controls-group tertiary">
+                        <button class="icon-btn hidden" id="speed-btn" title="Change playback speed (0.25x - 2.0x)"
+                            data-speed="1">1x</button>
+                        <button class="icon-btn hidden" id="loop-btn" title="Cycle through: No Loop → Loop All → Loop One">
+                            <i class="fas fa-repeat"></i>
+                        </button>
+                        <button class="icon-btn hidden" id="shuffle-btn" title="Toggle shuffle mode">
+                            <i class="fas fa-random"></i>
+                        </button>
+                        <button class="icon-btn hidden" id="pip-btn" title="Picture-in-picture mode">
+                            <i class="fas fa-clone"></i>
+                        </button>
+                        <button class="icon-btn hidden" id="playlist-btn" title="Toggle queue/playlist panel">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <button class="icon-btn hidden" id="open-file-btn" title="Browse and open a file">
+                            <i class="fas fa-folder-open"></i>
+                        </button>
+                        <div class="more-options-container">
+                            <button class="icon-btn" id="more-options-btn" title="More options">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div class="more-options-menu" id="more-options-menu">
+                                <button class="menu-item" id="menu-speed" data-speed="1">
+                                    <span class="menu-label">Speed</span>
+                                    <span class="menu-value">1x</span>
+                                </button>
+                                <button class="menu-item" id="menu-loop">
+                                    <span class="menu-label">Loop</span>
+                                    <span class="menu-value">Off</span>
+                                </button>
+                                <button class="menu-item" id="menu-shuffle">
+                                    <span class="menu-label">Shuffle</span>
+                                    <span class="menu-value">Off</span>
+                                </button>
+                                <div class="menu-divider"></div>
+                                <button class="menu-item" id="menu-pip">
+                                    <i class="fas fa-clone"></i>
+                                    <span>Picture-in-Picture</span>
+                                </button>
+                                <button class="menu-item" id="menu-playlist">
+                                    <i class="fas fa-bars"></i>
+                                    <span>Toggle Queue</span>
+                                </button>
+                                <button class="menu-item" id="menu-open-file">
+                                    <i class="fas fa-folder-open"></i>
+                                    <span>Open File</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -160,6 +288,34 @@
                 <i class="fas fa-play"></i>
             </button>
         </div>
+
+        <div class="context-menu" id="context-menu">
+            <button class="context-menu-item" id="ctx-speed">
+                <span class="ctx-label">Speed</span>
+                <span class="ctx-value">1x</span>
+            </button>
+            <button class="context-menu-item" id="ctx-loop">
+                <span class="ctx-label">Loop</span>
+                <span class="ctx-value">Off</span>
+            </button>
+            <button class="context-menu-item" id="ctx-shuffle">
+                <span class="ctx-label">Shuffle</span>
+                <span class="ctx-value">Off</span>
+            </button>
+            <div class="context-menu-divider"></div>
+            <button class="context-menu-item" id="ctx-pip">
+                <i class="fas fa-clone"></i>
+                <span>Picture-in-Picture</span>
+            </button>
+            <button class="context-menu-item" id="ctx-playlist">
+                <i class="fas fa-bars"></i>
+                <span>Toggle Queue</span>
+            </button>
+            <button class="context-menu-item" id="ctx-open-file">
+                <i class="fas fa-folder-open"></i>
+                <span>Open File</span>
+            </button>
+        </div>
     </div>
 
     <div class="modal" id="settings-modal">
@@ -181,6 +337,38 @@
                         <i class="fas fa-play"></i>
                         <span>Playback</span>
                     </button>
+                    <button class="settings-tab" data-tab="audio">
+                        <i class="fas fa-volume-high"></i>
+                        <span>Audio</span>
+                    </button>
+                    <button class="settings-tab" data-tab="subtitles">
+                        <i class="fas fa-closed-captioning"></i>
+                        <span>Subtitles</span>
+                    </button>
+                    <button class="settings-tab" data-tab="filters">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        <span>Filters</span>
+                    </button>
+                    <button class="settings-tab" data-tab="bookmarks">
+                        <i class="fas fa-bookmark"></i>
+                        <span>Bookmarks</span>
+                    </button>
+                    <button class="settings-tab" data-tab="profiles">
+                        <i class="fas fa-floppy-disk"></i>
+                        <span>Profiles</span>
+                    </button>
+                    <button class="settings-tab" data-tab="transcoding">
+                        <i class="fas fa-film"></i>
+                        <span>Convert</span>
+                    </button>
+                    <button class="settings-tab" data-tab="ffmpeg">
+                        <i class="fas fa-gears"></i>
+                        <span>FFmpeg</span>
+                    </button>
+                    <button class="settings-tab" data-tab="shortcuts">
+                        <i class="fas fa-keyboard"></i>
+                        <span>Shortcuts</span>
+                    </button>
                     <button class="settings-tab" data-tab="behavior">
                         <i class="fas fa-mouse"></i>
                         <span>Behavior</span>
@@ -188,6 +376,10 @@
                     <button class="settings-tab" data-tab="advanced">
                         <i class="fas fa-sliders-h"></i>
                         <span>Advanced</span>
+                    </button>
+                    <button class="settings-tab" data-tab="developer">
+                        <i class="fas fa-code"></i>
+                        <span>Developer</span>
                     </button>
                     <button class="settings-tab" data-tab="about">
                         <i class="fas fa-info-circle"></i>
@@ -319,7 +511,7 @@
                 </div>
 
                 <div class="settings-section" data-tab="advanced">
-                    <h3>Advanced</h3>
+                    <h3>Advanced Settings</h3>
                     <div class="setting-item checkbox">
                         <input type="checkbox" id="keyboard-shortcuts" class="checkbox-input" checked>
                         <label for="keyboard-shortcuts">Keyboard Shortcuts Enabled</label>
@@ -332,19 +524,79 @@
                         <input type="checkbox" id="shuffle-mode" class="checkbox-input">
                         <label for="shuffle-mode">Shuffle Mode</label>
                     </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="default-start-page" class="checkbox-input" checked>
+                        <label for="default-start-page">Start with Media Player (uncheck for Home)</label>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="preload-metadata" class="checkbox-input" checked>
+                        <label for="preload-metadata">Preload Metadata</label>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="enable-experimental" class="checkbox-input">
+                        <label for="enable-experimental">Enable Experimental Features</label>
+                    </div>
                     <div class="setting-item">
-                        <button class="btn btn-secondary" id="reset-settings-btn"
-                            title="Restore all settings to their default values">Reset to Default</button>
+                        <label>Cache Size</label>
+                        <div class="slider-container">
+                            <input type="range" id="cache-size" class="slider-input" min="100" max="1000" value="500" step="100">
+                            <span class="slider-value" id="cache-size-value">500 MB</span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <button class="btn btn-secondary" id="clear-cache-btn">Clear Cache</button>
+                    </div>
+                    <div class="setting-item">
+                        <button class="btn btn-secondary" id="reset-settings-btn">Reset to Default</button>
+                    </div>
+                </div>
+
+                <div class="settings-section" data-tab="developer">
+                    <h3>Developer Tools</h3>
+                    <div class="setting-item">
+                        <label>Log Level</label>
+                        <select id="log-level" class="select-input">
+                            <option value="TRACE">Trace (Most Verbose)</option>
+                            <option value="DEBUG">Debug</option>
+                            <option value="INFO" selected>Info (Default)</option>
+                            <option value="WARNING">Warning</option>
+                            <option value="ERROR">Error Only</option>
+                        </select>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="enable-logging" class="checkbox-input" checked>
+                        <label for="enable-logging">Enable File Logging</label>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <input type="checkbox" id="log-timestamps" class="checkbox-input" checked>
+                        <label for="log-timestamps">Show Timestamps</label>
+                    </div>
+                    <div class="dev-log-viewer">
+                        <div class="log-controls">
+                            <button class="btn btn-secondary" id="clear-logs-btn">Clear Logs</button>
+                            <button class="btn btn-secondary" id="export-logs-btn">Export Logs</button>
+                        </div>
+                        <div class="log-display" id="log-display">
+                            <div class="log-entry log-info">
+                                <span class="log-level">INFO</span>
+                                <span class="log-time">--:--:--</span>
+                                <span class="log-message">Logger initialized</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="settings-section" data-tab="about">
-                    <h3>About</h3>
+                    <h3>About Pulse</h3>
                     <div class="setting-item">
                         <label>Version</label>
                         <div class="version-display">
                             <span id="app-version">Loading...</span>
                         </div>
+                    </div>
+                    <div class="setting-item">
+                        <label>Build Information</label>
+                        <p class="info-text">Advanced media player for Electron</p>
                     </div>
                 </div>
             </div>
@@ -369,9 +621,27 @@
     <input type="file" id="file-input" accept="video/*,audio/*" style="display: none;">
 
     <script src="js/titlebar.js"></script>
+    <script src="js/logger.js"></script>
     <script src="js/contextMenu.js"></script>
+    <script src="js/database.js"></script>
     <script src="js/ffmpegWorker.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/home.js"></script>
+    <script src="js/subtitles.js"></script>
+    <script src="js/audioTracks.js"></script>
+    <script src="js/videoFilters.js"></script>
+    <script src="js/aspectRatio.js"></script>
+    <script src="js/bookmarks.js"></script>
+    <script src="js/zoom.js"></script>
+    <script src="js/playbackProfiles.js"></script>
+    <script src="js/screenshot.js"></script>
+    <script src="js/transcoding.js"></script>
+    <script src="js/clipboard.js"></script>
+    <script src="js/performance.js"></script>
+    <script src="js/ffmpegSettings.js"></script>
+    <script src="js/keyboardShortcuts.js"></script>
+    <script src="js/dragDrop.js"></script>
+    <script src="js/unsupported.js"></script>
     <script src="js/renderer.js"></script>
 </body>
 
