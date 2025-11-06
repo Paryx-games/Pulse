@@ -6,7 +6,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
     closeWindow: () => ipcRenderer.send('close-window'),
     getMaximizeState: () => ipcRenderer.invoke('get-maximize-state'),
     getVersion: () => ipcRenderer.invoke('get-version'),
-    logMessage: (type, message, ms) => ipcRenderer.invoke('log-message', type, message, ms)
+    logMessage: (type, message, ms) => ipcRenderer.invoke('log-message', type, message, ms),
+    getDirectoryContents: (dirPath) => ipcRenderer.invoke('get-directory-contents', dirPath),
+    selectDirectory: () => ipcRenderer.invoke('select-directory'),
+    getFileMetadata: (filePath) => ipcRenderer.invoke('get-file-metadata', filePath),
+    generateThumbnail: (filePath, timestamp = 5) => ipcRenderer.invoke('generate-thumbnail', filePath, timestamp),
+    captureScreenshot: (filePath, timestamp) => ipcRenderer.invoke('capture-screenshot', filePath, timestamp),
+    startTranscoding: (inputPath, outputPath, options) => ipcRenderer.invoke('start-transcoding', inputPath, outputPath, options),
+    parseSubtitleFile: (filePath) => ipcRenderer.invoke('parse-subtitle-file', filePath),
+    getAudioTracks: (filePath) => ipcRenderer.invoke('get-audio-tracks', filePath)
 });
 
 const startTime = Date.now();
