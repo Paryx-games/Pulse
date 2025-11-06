@@ -1,11 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>testing</title>
+    <title>Pulse - Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Montserrat, sans-serif;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 1200px;
+            height: 1200px;
+            background: radial-gradient(circle, rgba(0, 102, 255, 0.5) 0%, rgba(0, 102, 255, 0.2) 30%, transparent 90%);
+            pointer-events: none;
+            left: -400px;
+            top: 50%;
+            transform: translateY(-50%);
+            filter: blur(40px);
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            width: 1200px;
+            height: 1200px;
+            background: radial-gradient(circle, rgba(136, 0, 255, 0.5) 0%, rgba(136, 0, 255, 0.2) 30%, transparent 90%);
+            pointer-events: none;
+            right: -400px;
+            top: 50%;
+            transform: translateY(-50%);
+            filter: blur(40px);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 102, 255, 0.9);
+            }
+
+            70% {
+                box-shadow: 0 0 0 30px rgba(0, 102, 255, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 102, 255, 0);
+            }
+        }
+
+        @keyframes pulse-gray {
+            0% {
+                box-shadow: 0 0 0 0 rgba(136, 0, 255, 0.9);
+            }
+
+            70% {
+                box-shadow: 0 0 0 30px rgba(136, 0, 255, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(136, 0, 255, 0);
+            }
+        }
+
+        div {
+            position: relative;
+            z-index: 1;
+        }
+
+        a {
+            padding: 10px 25px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            display: inline-block;
+            cursor: pointer;
+            margin: 0 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background-color: #1a1a1a;
+            border: 1px solid #0066FF;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+
+        a:hover {
+            background-color: #252525;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 102, 255, 0.6), 0 0 20px rgba(136, 0, 255, 0.3);
+            border-color: #8800FF;
+        }
+
+        #downloadBtn {
+            background-color: #1a1a1a;
+        }
+
+        #sourceBtn {
+            background-color: #1a1a1a;
+        }
+
+        .version {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #aaa;
+            position: relative;
+            z-index: 1;
+        }
+
+        a.pulse-click {
+            animation: pulse 0.6s;
+        }
+
+        a.pulse-click-gray {
+            animation: pulse-gray 0.6s;
+        }
+
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(34, 34, 34, 0.5);
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-logo {
+            width: 32px;
+            height: 32px;
+        }
+
+        .topbar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .topbar-nav {
+            display: flex;
+            gap: 25px;
+        }
+
+        .topbar-nav a {
+            padding: 0;
+            margin: 0;
+            font-size: 0.95rem;
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+            color: #aaa;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .topbar-nav a:hover {
+            background-color: transparent;
+            box-shadow: none;
+            color: #fff;
+            transform: none;
+        }
+
+        .home-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #0066FF 0%, #8800FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>testing</h1>
+    <div class="topbar">
+        <div class="topbar-left">
+            <img src="../assets/icon/pulse.png" alt="Pulse Logo" class="topbar-logo">
+            <span class="topbar-title gradient-text">pulse</span>
+        </div>
+        <nav class="topbar-nav">
+            <a href="https://paryx-games.github.io/Pulse/">Home</a>
+            <a href="https://github.com/Paryx-games/Pulse/releases">Downloads</a>
+            <a href="https://github.com/Paryx-games/Pulse">Source Code</a>
+        </nav>
+    </div>
+
+    <img src="../assets/icon/pulse.png" alt="Pulse Logo" class="home-icon">
+    <h1><span class="gradient-text">Pulse</span> Media</h1>
+    <p>A lightweight and highly customizable media player</p>
+
+    <div>
+        <a id="downloadBtn" href="https://github.com/Paryx-games/Pulse/releases">Download</a>
+        <a id="sourceBtn" href="https://github.com/Paryx-games/Pulse">Source Code</a>
+    </div>
+
+    <div class="version" id="versionText">Loading...</div>
+
+    <script>
+        const downloadBtn = document.getElementById('downloadBtn');
+        const sourceBtn = document.getElementById('sourceBtn');
+        const versionText = document.getElementById('versionText');
+
+        fetch('https://raw.githubusercontent.com/Paryx-games/Pulse/refs/heads/main/version.txt')
+            .then(response => response.text())
+            .then(data => {
+                versionText.textContent = data.trim();
+            })
+            .catch(error => {
+                versionText.textContent = 'Version unavailable';
+            });
+
+        downloadBtn.addEventListener('click', function (e) {
+            downloadBtn.classList.remove('pulse-click');
+            void downloadBtn.offsetWidth;
+            downloadBtn.classList.add('pulse-click');
+        });
+
+        sourceBtn.addEventListener('click', function (e) {
+            sourceBtn.classList.remove('pulse-click-gray');
+            void sourceBtn.offsetWidth;
+            sourceBtn.classList.add('pulse-click-gray');
+        });
+    </script>
 </body>
+
 </html>
