@@ -66,8 +66,10 @@ if (!window.playerInitialized) {
     }
 
     function initializePlayer() {
-        console.log('Renderer process initialized');
+        window.logger.info('Renderer process initialized');
         setupEventListeners();
+        setupSidebar();
+        setupDeveloperTab();
         loadPlaylistFromStorage();
         setDefaultVolume();
         updatePlayButtonState();
@@ -77,7 +79,8 @@ if (!window.playerInitialized) {
         applySettings();
         loadVersion();
         setupVisualizer();
-        console.log('Player initialization complete');
+        checkDefaultStartPage();
+        window.logger.info('Player initialization complete');
     }
 
 
@@ -151,6 +154,9 @@ if (!window.playerInitialized) {
         loopBtn.addEventListener('click', toggleLoop);
 
         speedBtn.addEventListener('click', changeSpeed);
+
+        setupMoreOptionsMenu();
+        setupContextMenu();
 
         document.addEventListener('keydown', handleKeyboard);
 
@@ -232,8 +238,10 @@ if (!window.playerInitialized) {
         if (!videoPlayer.src) return;
         if (isPlaying) {
             videoPlayer.pause();
+            window.logger.debug('Playback paused');
         } else {
             videoPlayer.play();
+            window.logger.debug('Playback started');
         }
     }
 
@@ -242,17 +250,20 @@ if (!window.playerInitialized) {
         videoPlayer.currentTime = 0;
         isPlaying = false;
         updatePlayButtonState();
+        window.logger.debug('Playback stopped');
     }
 
     function playPrevious() {
         if (playlist.length === 0) return;
         currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+        window.logger.debug(`Playing previous item (index: ${currentIndex})`);
         loadPlaylistItem(currentIndex);
     }
 
     function playNext() {
         if (playlist.length === 0) return;
         currentIndex = (currentIndex + 1) % playlist.length;
+        window.logger.debug(`Playing next item (index: ${currentIndex})`);
         loadPlaylistItem(currentIndex);
     }
 
@@ -278,6 +289,7 @@ if (!window.playerInitialized) {
     function toggleLoop() {
         isLooping = !isLooping;
         loopBtn.classList.toggle('active', isLooping);
+        window.logger.debug(`Loop mode ${isLooping ? 'enabled' : 'disabled'}`);
     }
 
     function changeSpeed() {
@@ -286,6 +298,7 @@ if (!window.playerInitialized) {
         videoPlayer.playbackRate = speed;
         speedBtn.textContent = speed + 'x';
         speedBtn.setAttribute('data-speed', speed);
+        window.logger.debug(`Playback speed changed to ${speed}x`);
     }
 
 
@@ -304,6 +317,7 @@ if (!window.playerInitialized) {
         previousVolume = volumeSlider.value;
         isMuted = false;
         updateVolumeIcon();
+        window.logger.trace(`Volume changed to ${sanitizeNumber(volumeSlider.value)}%`);
     }
 
     function updateVolumeSlider() {
@@ -327,9 +341,11 @@ if (!window.playerInitialized) {
             previousVolume = volumeSlider.value;
             volumeSlider.value = 0;
             isMuted = true;
+            window.logger.debug('Audio muted');
         } else {
             volumeSlider.value = previousVolume;
             isMuted = false;
+            window.logger.debug('Audio unmuted');
         }
         updateVolume();
     }
@@ -337,7 +353,9 @@ if (!window.playerInitialized) {
 
     function seekVideo() {
         const percent = progressBar.value;
-        videoPlayer.currentTime = (percent / 100) * videoPlayer.duration;
+        const newTime = (percent / 100) * videoPlayer.duration;
+        videoPlayer.currentTime = newTime;
+        window.logger.trace(`Seeked to ${formatTime(newTime)}`);
     }
 
     function updateProgress() {
@@ -371,6 +389,7 @@ if (!window.playerInitialized) {
 
     function handleFileSelect(e) {
         const files = Array.from(e.target.files);
+        window.logger.info(`${files.length} file(s) selected`);
         files.forEach(file => addToPlaylist(file));
         fileInput.value = '';
     }
@@ -378,6 +397,7 @@ if (!window.playerInitialized) {
     function handleDragOver(e) {
         e.preventDefault();
         playerWrapper.style.background = 'rgba(59, 130, 246, 0.08)';
+        window.logger.trace('File drag over detected');
     }
 
     function handleDragLeave() {
@@ -388,11 +408,15 @@ if (!window.playerInitialized) {
         e.preventDefault();
         playerWrapper.style.background = '';
         const files = Array.from(e.dataTransfer.files);
+        window.logger.info(`${files.length} file(s) dropped`);
         files.forEach(file => addToPlaylist(file));
     }
 
     function addToPlaylist(file) {
-        if (!file.type.startsWith('video/') && !file.type.startsWith('audio/')) return;
+        if (!file.type.startsWith('video/') && !file.type.startsWith('audio/')) {
+            window.logger.warning(`Skipped unsupported file type: ${file.type}`);
+            return;
+        }
 
         const url = URL.createObjectURL(file);
         playlist.push({
@@ -401,6 +425,7 @@ if (!window.playerInitialized) {
             type: file.type,
         });
 
+        window.logger.debug(`Added to playlist: ${file.name}`);
         savePlaylistToStorage();
         updatePlaylistUI();
 
@@ -415,7 +440,20 @@ if (!window.playerInitialized) {
         const item = playlist[index];
         videoPlayer.src = item.url;
         fileName.textContent = item.name;
+        window.logger.info(`Loading: ${item.name}`);
         updatePlaylistUI();
+        updateControlsVisibility();
+        
+        if (window.bookmarkManager) {
+            window.bookmarkManager.loadBookmarks(item.url);
+        }
+        if (window.audioTrackManager) {
+            window.audioTrackManager.loadAudioTracks(item.url);
+        }
+        if (window.database) {
+            window.database.getMetadata(item.url);
+        }
+        
         videoPlayer.play().catch(() => { });
     }
 
@@ -452,8 +490,9 @@ if (!window.playerInitialized) {
         }));
         try {
             localStorage.setItem('pulsePlaylist', JSON.stringify(playlistData));
+            window.logger.debug(`Playlist saved to storage (${playlist.length} items)`);
         } catch (e) {
-            console.warn('Could not save playlist:', e);
+            window.logger.error(`Could not save playlist: ${e.message}`);
         }
     }
 
@@ -461,10 +500,10 @@ if (!window.playerInitialized) {
         try {
             const saved = localStorage.getItem('pulsePlaylist');
             if (saved && saved !== '[]') {
-
+                window.logger.debug('Playlist loaded from storage');
             }
         } catch (e) {
-            console.warn('Could not load playlist:', e);
+            window.logger.warning(`Could not load playlist: ${e.message}`);
         }
     }
 
@@ -486,19 +525,23 @@ if (!window.playerInitialized) {
 
     function openSettings() {
         settingsModal.classList.add('active');
+        window.logger.debug('Settings modal opened');
     }
 
     function closeSettings() {
         settingsModal.classList.remove('active');
+        window.logger.debug('Settings modal closed');
     }
 
     function openInfo() {
         updateMediaInfo();
         infoModal.classList.add('active');
+        window.logger.debug('Media info modal opened');
     }
 
     function closeInfo() {
         infoModal.classList.remove('active');
+        window.logger.debug('Media info modal closed');
     }
 
     function updateMediaInfo() {
@@ -540,16 +583,22 @@ if (!window.playerInitialized) {
         });
 
         content.appendChild(grid);
+
+        if (window.performanceMetrics) {
+            window.performanceMetrics.displayMetrics(infoModal);
+        }
     }
 
 
     function toggleFullscreen() {
         if (!document.fullscreenElement) {
             playerWrapper.requestFullscreen().catch(err => {
-                console.log('Fullscreen error:', err);
+                window.logger.error(`Fullscreen error: ${err.message}`);
             });
+            window.logger.debug('Fullscreen entered');
         } else {
             document.exitFullscreen();
+            window.logger.debug('Fullscreen exited');
         }
     }
 
@@ -663,25 +712,164 @@ if (!window.playerInitialized) {
         } else {
             videoPlayer.currentTime = 0;
         }
+        window.logger.debug(`Skipped backward to ${formatTime(videoPlayer.currentTime)}`);
     }
 
     function skipForward() {
         videoPlayer.currentTime = Math.min(videoPlayer.currentTime + 10, videoPlayer.duration);
+        window.logger.debug(`Skipped forward to ${formatTime(videoPlayer.currentTime)}`);
     }
 
     function togglePictureInPicture() {
         if (document.pictureInPictureElement) {
-            document.exitPictureInPicture().catch(error => console.error('Error exiting PiP:', error));
+            document.exitPictureInPicture().catch(error => window.logger.error('Error exiting PiP:', error));
         } else {
-            videoPlayer.requestPictureInPicture().catch(error => console.error('Error entering PiP:', error));
+            videoPlayer.requestPictureInPicture().catch(error => window.logger.error('Error entering PiP:', error));
         }
         pipBtn.classList.toggle('active');
+        const isPiP = document.pictureInPictureElement !== null;
+        window.logger.debug(`Picture-in-picture ${isPiP ? 'enabled' : 'disabled'}`);
     }
 
     function toggleShuffle() {
         isShuffle = !isShuffle;
         shuffleBtn.classList.toggle('active', isShuffle);
-        console.log('Shuffle mode:', isShuffle ? 'ON' : 'OFF');
+        window.logger.debug(`Shuffle mode ${isShuffle ? 'enabled' : 'disabled'}`);
+    }
+
+    function setupMoreOptionsMenu() {
+        const moreOptionsBtn = document.getElementById('more-options-btn');
+        const moreOptionsMenu = document.getElementById('more-options-menu');
+        const menuSpeed = document.getElementById('menu-speed');
+        const menuLoop = document.getElementById('menu-loop');
+        const menuShuffle = document.getElementById('menu-shuffle');
+        const menuPip = document.getElementById('menu-pip');
+        const menuPlaylist = document.getElementById('menu-playlist');
+        const menuOpenFile = document.getElementById('menu-open-file');
+
+        moreOptionsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            moreOptionsMenu.classList.toggle('active');
+            updateMoreOptionsMenuValues();
+            document.getElementById('context-menu').classList.remove('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!moreOptionsBtn.contains(e.target) && !moreOptionsMenu.contains(e.target)) {
+                moreOptionsMenu.classList.remove('active');
+            }
+        });
+
+        menuSpeed.addEventListener('click', () => {
+            changeSpeed();
+            updateMoreOptionsMenuValues();
+        });
+
+        menuLoop.addEventListener('click', () => {
+            toggleLoop();
+            updateMoreOptionsMenuValues();
+        });
+
+        menuShuffle.addEventListener('click', () => {
+            toggleShuffle();
+            updateMoreOptionsMenuValues();
+        });
+
+        menuPip.addEventListener('click', () => {
+            togglePictureInPicture();
+            moreOptionsMenu.classList.remove('active');
+        });
+
+        menuPlaylist.addEventListener('click', () => {
+            togglePlaylist();
+            moreOptionsMenu.classList.remove('active');
+        });
+
+        menuOpenFile.addEventListener('click', () => {
+            fileInput.click();
+            moreOptionsMenu.classList.remove('active');
+        });
+    }
+
+    function updateMoreOptionsMenuValues() {
+        const menuSpeed = document.getElementById('menu-speed');
+        const menuLoop = document.getElementById('menu-loop');
+        const menuShuffle = document.getElementById('menu-shuffle');
+
+        const speedValue = playbackSpeeds[currentSpeedIndex];
+        menuSpeed.querySelector('.menu-value').textContent = speedValue + 'x';
+
+        menuLoop.querySelector('.menu-value').textContent = isLooping ? 'All' : 'Off';
+
+        menuShuffle.querySelector('.menu-value').textContent = isShuffle ? 'On' : 'Off';
+    }
+
+    function setupContextMenu() {
+        const contextMenu = document.getElementById('context-menu');
+        const ctxSpeed = document.getElementById('ctx-speed');
+        const ctxLoop = document.getElementById('ctx-loop');
+        const ctxShuffle = document.getElementById('ctx-shuffle');
+        const ctxPip = document.getElementById('ctx-pip');
+        const ctxPlaylist = document.getElementById('ctx-playlist');
+        const ctxOpenFile = document.getElementById('ctx-open-file');
+
+        playerWrapper.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            contextMenu.style.left = e.clientX + 'px';
+            contextMenu.style.top = e.clientY + 'px';
+            contextMenu.classList.add('active');
+            updateContextMenuValues();
+            document.getElementById('more-options-menu').classList.remove('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!contextMenu.contains(e.target) && e.target !== playerWrapper) {
+                contextMenu.classList.remove('active');
+            }
+        });
+
+        ctxSpeed.addEventListener('click', () => {
+            changeSpeed();
+            updateContextMenuValues();
+        });
+
+        ctxLoop.addEventListener('click', () => {
+            toggleLoop();
+            updateContextMenuValues();
+        });
+
+        ctxShuffle.addEventListener('click', () => {
+            toggleShuffle();
+            updateContextMenuValues();
+        });
+
+        ctxPip.addEventListener('click', () => {
+            togglePictureInPicture();
+            contextMenu.classList.remove('active');
+        });
+
+        ctxPlaylist.addEventListener('click', () => {
+            togglePlaylist();
+            contextMenu.classList.remove('active');
+        });
+
+        ctxOpenFile.addEventListener('click', () => {
+            fileInput.click();
+            contextMenu.classList.remove('active');
+        });
+    }
+
+    function updateContextMenuValues() {
+        const ctxSpeed = document.getElementById('ctx-speed');
+        const ctxLoop = document.getElementById('ctx-loop');
+        const ctxShuffle = document.getElementById('ctx-shuffle');
+
+        const speedValue = playbackSpeeds[currentSpeedIndex];
+        ctxSpeed.querySelector('.ctx-value').textContent = speedValue + 'x';
+
+        ctxLoop.querySelector('.ctx-value').textContent = isLooping ? 'All' : 'Off';
+
+        ctxShuffle.querySelector('.ctx-value').textContent = isShuffle ? 'On' : 'Off';
     }
 
     let audioContext = null;
@@ -824,4 +1012,230 @@ if (!window.playerInitialized) {
             }
         }
     }
+
+    function updateControlsVisibility() {
+        const hasMedia = playlist.length > 0;
+        const infoBar = document.querySelector('.info-bar');
+        const playbackControls = document.querySelector('.playback-controls');
+        
+        if (infoBar) {
+            infoBar.style.display = hasMedia ? 'flex' : 'none';
+        }
+        if (playbackControls) {
+            playbackControls.style.display = hasMedia ? 'flex' : 'none';
+        }
+    }
+
+    window.goToPlayer = function(filePath) {
+        const homePage = document.getElementById('home-page');
+        const playerWrapper = document.querySelector('.player-wrapper');
+        
+        if (homePage) homePage.classList.add('hidden');
+        if (playerWrapper) playerWrapper.classList.add('show');
+        
+        loadFile(filePath);
+    };
+
+    window.goToHome = function() {
+        const homePage = document.getElementById('home-page');
+        const playerWrapper = document.querySelector('.player-wrapper');
+        
+        if (homePage) homePage.classList.remove('hidden');
+        if (playerWrapper) playerWrapper.classList.remove('show');
+    };
+
+    async function trackPlayback() {
+        if (playlist.length > 0 && currentIndex < playlist.length) {
+            const currentFile = playlist[currentIndex];
+            try {
+                await database.addToHistory(currentFile, { name: currentFile }, videoPlayer.currentTime);
+            } catch (error) {
+                console.error('Failed to track playback:', error);
+            }
+        }
+    }
+
+    const originalHandleVideoEnd = handleVideoEnd;
+    handleVideoEnd = function() {
+        trackPlayback();
+        originalHandleVideoEnd();
+    };
+
+    function setupSidebar() {
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+
+        if (!hamburgerBtn) return;
+
+        hamburgerBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sidebar.classList.add('active');
+            sidebarOverlay.classList.add('active');
+            window.logger.debug('Sidebar opened');
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+            closeSidebar();
+        });
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                window.logger.info(`Navigating to: ${page}`);
+
+                if (page === 'home') {
+                    window.goToHome();
+                } else if (page === 'player') {
+                    const homePage = document.getElementById('home-page');
+                    const playerWrapper = document.querySelector('.player-wrapper');
+                    if (homePage) homePage.classList.add('hidden');
+                    if (playerWrapper) playerWrapper.classList.add('show');
+                }
+
+                closeSidebar();
+            });
+        });
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            window.logger.debug('Sidebar closed');
+        }
+    }
+
+    function setupDeveloperTab() {
+        const logLevelSelect = document.getElementById('log-level');
+        const clearLogsBtn = document.getElementById('clear-logs-btn');
+        const exportLogsBtn = document.getElementById('export-logs-btn');
+        const enableLoggingCheckbox = document.getElementById('enable-logging');
+        const logTimestampsCheckbox = document.getElementById('log-timestamps');
+        const cacheSizeInput = document.getElementById('cache-size');
+        const clearCacheBtn = document.getElementById('clear-cache-btn');
+        const defaultStartPageCheckbox = document.getElementById('default-start-page');
+
+        if (logLevelSelect) {
+            logLevelSelect.addEventListener('change', (e) => {
+                const level = e.target.value;
+                window.logger.setLogLevel(level);
+                window.settingsManager.setSetting('logLevel', level);
+            });
+        }
+
+        if (clearLogsBtn) {
+            clearLogsBtn.addEventListener('click', () => {
+                window.logger.clearLogs();
+                window.logger.info('Developer cleared logs');
+            });
+        }
+
+        if (exportLogsBtn) {
+            exportLogsBtn.addEventListener('click', () => {
+                window.logger.exportLogs();
+                window.logger.info('Developer exported logs');
+            });
+        }
+
+        if (enableLoggingCheckbox) {
+            enableLoggingCheckbox.addEventListener('change', (e) => {
+                window.logger.enableFileLogging = e.target.checked;
+                window.settingsManager.setSetting('enableLogging', e.target.checked);
+                window.logger.info(`File logging ${e.target.checked ? 'enabled' : 'disabled'}`);
+            });
+        }
+
+        if (logTimestampsCheckbox) {
+            logTimestampsCheckbox.addEventListener('change', (e) => {
+                window.logger.showTimestamps = e.target.checked;
+                window.settingsManager.setSetting('logTimestamps', e.target.checked);
+                window.logger.info(`Log timestamps ${e.target.checked ? 'enabled' : 'disabled'}`);
+            });
+        }
+
+        if (cacheSizeInput) {
+            cacheSizeInput.addEventListener('input', (e) => {
+                const size = parseInt(e.target.value);
+                const sizeValue = document.getElementById('cache-size-value');
+                if (sizeValue) {
+                    sizeValue.textContent = `${size} MB`;
+                }
+                window.settingsManager.setSetting('cacheSize', size);
+                window.logger.debug(`Cache size set to ${size} MB`);
+            });
+        }
+
+        if (clearCacheBtn) {
+            clearCacheBtn.addEventListener('click', () => {
+                window.logger.info('Cache cleared by user');
+                window.settingsManager.setSetting('cacheCleared', Date.now());
+            });
+        }
+
+        if (defaultStartPageCheckbox) {
+            defaultStartPageCheckbox.addEventListener('change', (e) => {
+                window.settingsManager.setSetting('defaultStartPage', e.target.checked ? 'player' : 'home');
+                window.logger.info(`Default start page set to: ${e.target.checked ? 'player' : 'home'}`);
+            });
+        }
+
+        const savedLogLevel = window.settingsManager.getSetting('logLevel') || 'INFO';
+        if (logLevelSelect) {
+            logLevelSelect.value = savedLogLevel;
+            window.logger.setLogLevel(savedLogLevel);
+        }
+
+        const enabledLogging = window.settingsManager.getSetting('enableLogging') !== false;
+        if (enableLoggingCheckbox) {
+            enableLoggingCheckbox.checked = enabledLogging;
+            window.logger.enableFileLogging = enabledLogging;
+        }
+
+        const showTimestamps = window.settingsManager.getSetting('logTimestamps') !== false;
+        if (logTimestampsCheckbox) {
+            logTimestampsCheckbox.checked = showTimestamps;
+            window.logger.showTimestamps = showTimestamps;
+        }
+    }
+
+    function checkDefaultStartPage() {
+        const startPage = window.settingsManager.getSetting('defaultStartPage') || 'player';
+        const homePage = document.getElementById('home-page');
+        const playerWrapper = document.querySelector('.player-wrapper');
+
+        if (startPage === 'home') {
+            if (homePage) homePage.classList.remove('hidden');
+            if (playerWrapper) playerWrapper.classList.remove('show');
+            const homeItem = document.querySelector('.sidebar-item[data-page="home"]');
+            const playerItem = document.querySelector('.sidebar-item[data-page="player"]');
+            if (homeItem) homeItem.classList.add('active');
+            if (playerItem) playerItem.classList.remove('active');
+            window.logger.info('Starting with Home page');
+        } else {
+            if (homePage) homePage.classList.add('hidden');
+            if (playerWrapper) playerWrapper.classList.add('show');
+            window.logger.info('Starting with Media Player');
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+            e.preventDefault();
+            const logDisplay = document.getElementById('log-display');
+            if (logDisplay) {
+                const modal = document.getElementById('settings-modal');
+                if (modal) {
+                    modal.classList.add('active');
+                    const devTab = document.querySelector('[data-tab="developer"]');
+                    if (devTab) {
+                        devTab.click();
+                    }
+                }
+            }
+            window.logger.debug('Developer console opened');
+        }
+    });
 }
