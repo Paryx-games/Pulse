@@ -7,9 +7,15 @@
     "type": "commonjs",
     "scripts": {
         "start": "electron .",
-        "dev": "set NODE_ENV=development && electron .",
-        "build-production": "electron-builder",
-        "build-dev": "npx electron-packager . \"Pulse Media\" --platform=win32 --arch=x64 --icon=assets/icon/pulse.ico --out=dist --overwrite"
+        "dev": "node dev.js",
+        "vite": "vite",
+        "vite:build": "vite build",
+        "clean": "rimraf dist dist-electron",
+        "build:dev": "echo DEV BUILD && vite build && echo Building Pulse Media... && npx electron-builder --win portable --x64 || (echo. && echo Build failed! && exit /b) && echo. && echo Build complete!",
+        "build:prod": "echo PRODUCTION BUILD && vite build && echo Building Pulse Media... && npx electron-builder --win nsis msi --x64 || (echo. && echo Build failed! && exit /b) && echo. && echo Build complete!",
+        "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+        "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+        "prepare": "husky install"
     },
     "keywords": [
         "media-player",
@@ -20,12 +26,22 @@
     "license": "GPL-3.0",
     "dependencies": {
         "@ffmpeg/ffmpeg": "^0.12.15",
-        "@ffmpeg/util": "^0.12.1"
+        "@ffmpeg/util": "^0.12.1",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
     },
     "devDependencies": {
-        "electron": "^39.1.0",
+        "@typescript-eslint/eslint-plugin": "^6.13.0",
+        "@typescript-eslint/parser": "^6.13.0",
+        "@vitejs/plugin-react": "^4.2.1",
+        "electron": "^39.1.1",
         "electron-builder": "^26.0.12",
-        "electron-packager": "^17.1.2"
+        "eslint": "^8.54.0",
+        "husky": "^8.0.3",
+        "rimraf": "^6.1.0",
+        "terser": "^5.44.1",
+        "typescript": "^5.3.3",
+        "vite": "^5.0.0"
     },
     "build": {
         "appId": "com.pulsemedia.app",
@@ -43,7 +59,8 @@
         "win": {
             "target": [
                 "nsis",
-                "msi"
+                "msi",
+                "portable"
             ],
             "icon": "assets/icon/pulse.ico"
         },
