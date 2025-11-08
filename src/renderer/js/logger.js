@@ -8,7 +8,6 @@ if (!window.Logger) {
             this.showTimestamps = true;
             this.logDisplay = null;
 
-            const levels = ['TRACE', 'DEBUG', 'INFO', 'WARNING', 'ERROR'];
             this.levelIndex = {
                 'TRACE': 0,
                 'DEBUG': 1,
@@ -117,7 +116,7 @@ if (!window.Logger) {
     }
 
     setLogLevel(level) {
-        if (this.levelIndex.hasOwnProperty(level)) {
+        if (Object.hasOwn(this.levelIndex, level)) {
             this.logLevel = level;
             this.info(`Log level set to ${level}`);
         }

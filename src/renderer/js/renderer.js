@@ -277,6 +277,19 @@ if (!window.playerInitialized) {
     }
 
     function handleVideoEnd() {
+        const videoEnded = async () => {
+            if (playlist.length > 0 && currentIndex < playlist.length) {
+                const currentFile = playlist[currentIndex];
+                try {
+                    await database.addToHistory(currentFile, { name: currentFile }, videoPlayer.currentTime);
+                } catch (error) {
+                    console.error('Failed to track playback:', error);
+                }
+            }
+        };
+
+        videoEnded();
+
         if (isLooping) {
             videoPlayer.currentTime = 0;
             videoPlayer.play();
@@ -653,12 +666,13 @@ if (!window.playerInitialized) {
             case '>':
                 changeSpeed();
                 break;
-            case '<':
+            case '<': {
                 currentSpeedIndex = (currentSpeedIndex - 1 + playbackSpeeds.length) % playbackSpeeds.length;
                 const speed = playbackSpeeds[currentSpeedIndex];
                 videoPlayer.playbackRate = speed;
                 speedBtn.textContent = speed + 'x';
                 break;
+            }
         }
     }
 
@@ -1035,6 +1049,32 @@ if (!window.playerInitialized) {
         }
     }
 
+    function loadFile(filePath) {
+        playlist.length = 0;
+        currentIndex = 0;
+        
+        if (fileName) {
+            const baseName = filePath.split(/[\\/]/).pop();
+            fileName.textContent = baseName;
+        }
+        
+        videoPlayer.src = filePath;
+        videoPlayer.play().catch(() => { });
+        
+        window.logger.info(`Loading: ${filePath}`);
+        updateControlsVisibility();
+        
+        if (window.bookmarkManager) {
+            window.bookmarkManager.loadBookmarks(filePath);
+        }
+        if (window.audioTrackManager) {
+            window.audioTrackManager.loadAudioTracks(filePath);
+        }
+        if (window.database) {
+            window.database.getMetadata(filePath);
+        }
+    }
+
     window.goToPlayer = function(filePath) {
         const homePage = document.getElementById('home-page');
         const playerWrapper = document.querySelector('.player-wrapper');
@@ -1053,22 +1093,7 @@ if (!window.playerInitialized) {
         if (playerWrapper) playerWrapper.classList.remove('show');
     };
 
-    async function trackPlayback() {
-        if (playlist.length > 0 && currentIndex < playlist.length) {
-            const currentFile = playlist[currentIndex];
-            try {
-                await database.addToHistory(currentFile, { name: currentFile }, videoPlayer.currentTime);
-            } catch (error) {
-                console.error('Failed to track playback:', error);
-            }
-        }
-    }
 
-    const originalHandleVideoEnd = handleVideoEnd;
-    handleVideoEnd = function() {
-        trackPlayback();
-        originalHandleVideoEnd();
-    };
 
     function setupSidebar() {
         const hamburgerBtn = document.getElementById('hamburger-btn');

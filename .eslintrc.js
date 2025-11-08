@@ -28,11 +28,20 @@ module.exports = {
     {
       files: [
         'src/main/**/*.js',
-        'src/main/**/*.ts'
+        'src/main/**/*.ts',
+        'src/renderer/js/preload.js',
+        'dev.js'
       ],
       env: {
         node: true,
-        browser: false
+        browser: false,
+        commonjs: true
+      },
+      parserOptions: {
+        sourceType: 'commonjs'
+      },
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off'
       }
     },
     {
@@ -45,6 +54,12 @@ module.exports = {
       env: {
         browser: true,
         node: false
+      },
+      globals: {
+        database: 'readonly'
+      },
+      rules: {
+        'no-inner-declarations': 'off'
       }
     }
   ]

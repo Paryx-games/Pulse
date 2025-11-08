@@ -1,15 +1,12 @@
-if (!window.ffmpegWorkerInitialized) {
-    window.ffmpegWorkerInitialized = true;
-    
-    let ffmpeg;
-    let ffmpegReady = false;
+let ffmpeg;
+let ffmpegReady = false;
 
-async function initFFmpeg() {
+const initFFmpeg = async () => {
     if (ffmpegReady) return;
 
     try {
         const FFmpegModule = await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/ffmpeg.js');
-        const { FFmpeg: FFmpegClass, fetchFile } = FFmpegModule;
+        const { FFmpeg: FFmpegClass } = FFmpegModule;
         ffmpeg = new FFmpegClass();
 
         ffmpeg.on('log', ({ type, message }) => {
@@ -19,7 +16,7 @@ async function initFFmpeg() {
         ffmpeg.on('progress', ({ progress }) => {
             window.parent.postMessage({
                 type: 'ffmpeg-progress',
-                progress: progress
+                progress
             }, '*');
         });
 
@@ -34,9 +31,9 @@ async function initFFmpeg() {
     } catch (error) {
         console.error('Failed to initialize FFmpeg:', error);
     }
-}
+};
 
-async function convertVideo(inputData, inputName, outputName = 'output.mp4') {
+const convertVideo = async (inputData, inputName, outputName = 'output.mp4') => {
     try {
         if (!ffmpegReady) {
             await initFFmpeg();
@@ -56,8 +53,10 @@ async function convertVideo(inputData, inputName, outputName = 'output.mp4') {
         console.error('Conversion error:', error);
         throw error;
     }
-}
+};
 
+if (!window.ffmpegWorkerInitialized) {
+    window.ffmpegWorkerInitialized = true;
     window.FFmpegWorker = {
         initFFmpeg,
         convertVideo
