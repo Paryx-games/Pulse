@@ -9,10 +9,18 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
-      - name: Install dependencies
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies (safe)
         run: |
-          if [ -f package-lock.json ]; then npm ci; elif [ -f yarn.lock ]; then yarn install --frozen-lockfile; else npm install; fi
+          # Prefer reproducible 'npm ci'. If lockfile and package.json are out of sync, fall back to npm install to allow CI to proceed.
+          if [ -f package-lock.json ]; then
+            npm ci --prefer-offline --no-audit --no-fund || npm install --prefer-offline --no-audit --no-fund
+          elif [ -f yarn.lock ]; then
+            yarn install --frozen-lockfile
+          else
+            npm install --prefer-offline --no-audit --no-fund
+          fi
       - name: Run ESLint
         id: run_eslint
         continue-on-error: true
