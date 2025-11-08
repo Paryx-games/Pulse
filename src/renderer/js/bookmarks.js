@@ -1,8 +1,9 @@
-class BookmarkManager {
-    constructor() {
-        this.videoElement = null;
-        this.bookmarks = [];
-        this.currentFile = null;
+if (!window.BookmarkManager) {
+    class BookmarkManager {
+        constructor() {
+            this.videoElement = null;
+            this.bookmarks = [];
+            this.currentFile = null;
         this.init();
     }
 
@@ -196,7 +197,9 @@ class BookmarkManager {
         div.textContent = text;
         return div.innerHTML;
     }
-}
+    }
 
-const bookmarkManager = new BookmarkManager();
-window.bookmarkManager = bookmarkManager;
+    window.BookmarkManager = BookmarkManager;
+    const bookmarkManager = new BookmarkManager();
+    window.bookmarkManager = bookmarkManager;
+}

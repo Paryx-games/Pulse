@@ -14,7 +14,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     captureScreenshot: (filePath, timestamp) => ipcRenderer.invoke('capture-screenshot', filePath, timestamp),
     startTranscoding: (inputPath, outputPath, options) => ipcRenderer.invoke('start-transcoding', inputPath, outputPath, options),
     parseSubtitleFile: (filePath) => ipcRenderer.invoke('parse-subtitle-file', filePath),
-    getAudioTracks: (filePath) => ipcRenderer.invoke('get-audio-tracks', filePath)
+    getAudioTracks: (filePath) => ipcRenderer.invoke('get-audio-tracks', filePath),
+    openFile: () => ipcRenderer.invoke('dialog:openFile'),
+    ipcRenderer: ipcRenderer
 });
 
 const startTime = Date.now();

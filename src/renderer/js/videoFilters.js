@@ -1,8 +1,9 @@
-class VideoFilterManager {
-    constructor() {
-        this.videoElement = null;
-        this.brightness = 100;
-        this.contrast = 100;
+if (!window.VideoFilterManager) {
+    class VideoFilterManager {
+        constructor() {
+            this.videoElement = null;
+            this.brightness = 100;
+            this.contrast = 100;
         this.saturation = 100;
         this.hue = 0;
         this.init();
@@ -141,6 +142,9 @@ class VideoFilterManager {
             this.applyFilters();
         }
     }
-}
+    }
 
-const videoFilterManager = new VideoFilterManager();
+    window.VideoFilterManager = VideoFilterManager;
+    const videoFilterManager = new VideoFilterManager();
+    window.videoFilterManager = videoFilterManager;
+}

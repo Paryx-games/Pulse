@@ -1,4 +1,5 @@
-class ClipboardManager {
+if (!window.ClipboardManager) {
+    class ClipboardManager {
     constructor() {
         this.videoElement = null;
         this.init();
@@ -86,6 +87,9 @@ class ClipboardManager {
         navigator.clipboard.writeText(subtitleDisplay.textContent);
         this.showCopyNotification(subtitleDisplay.textContent);
     }
-}
+    }
 
-const clipboardManager = new ClipboardManager();
+    window.ClipboardManager = ClipboardManager;
+    const clipboardManager = new ClipboardManager();
+    window.clipboardManager = clipboardManager;
+}

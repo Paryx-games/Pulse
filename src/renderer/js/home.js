@@ -1,12 +1,13 @@
-class HomePage {
-    constructor() {
-        this.currentBrowsePath = '';
-        this.favorites = [];
-        this.recentFiles = [];
-        this.collections = [];
-        this.searchQuery = '';
-        this.init();
-    }
+if (!window.HomePage) {
+    class HomePage {
+        constructor() {
+            this.currentBrowsePath = '';
+            this.favorites = [];
+            this.recentFiles = [];
+            this.collections = [];
+            this.searchQuery = '';
+            this.init();
+        }
 
     async init() {
         this.setupEventListeners();
@@ -359,7 +360,9 @@ class HomePage {
         div.textContent = text;
         return div.innerHTML;
     }
-}
+    }
 
-const homePage = new HomePage();
-window.homePage = homePage;
+    window.HomePage = HomePage;
+    const homePage = new HomePage();
+    window.homePage = homePage;
+}

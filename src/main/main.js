@@ -31,7 +31,7 @@ function createWindow() {
         height: 720,
         minWidth: 800,
         minHeight: 600,
-        frame: false,
+        frame: true,
         transparent: true,
         backgroundColor: '#00000000',
         webPreferences: {
@@ -44,14 +44,18 @@ function createWindow() {
         }
     });
 
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
-
-    logger.log('INFO', 'Window loaded successfully');
+    mainWindow.removeMenu();
 
     if (process.env.NODE_ENV === 'development') {
+        mainWindow.loadURL('http://localhost:5173');
         mainWindow.webContents.openDevTools();
-        logger.log('INFO', 'DevTools opened (development mode)');
+        logger.log('INFO', 'Loaded from dev server (development mode)');
+    } else {
+        mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+        logger.log('INFO', 'Window loaded from file (production mode)');
     }
+
+    logger.log('INFO', 'Window loaded successfully');
 
     mainWindow.on('closed', () => {
         logger.log('INFO', 'Application window closed');
@@ -368,6 +372,21 @@ ipcMain.handle('get-audio-tracks', async (event, filePath) => {
         logger.logError('Audio track detection error', error);
         throw error;
     }
+});
+
+ipcMain.handle('dialog:openFile', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openFile'],
+        filters: [
+            { name: 'All Media', extensions: ['mp4', 'webm', 'mkv', 'avi', 'mov', 'flv', 'wmv', 'mp3', 'wav', 'aac', 'ogg', 'flac', 'm4a'] },
+            { name: 'Video', extensions: ['mp4', 'webm', 'mkv', 'avi', 'mov', 'flv', 'wmv'] },
+            { name: 'Audio', extensions: ['mp3', 'wav', 'aac', 'ogg', 'flac', 'm4a'] },
+            { name: 'All Files', extensions: ['*'] }
+        ]
+    });
+
+    if (result.canceled) return null;
+    return result.filePaths[0];
 });
 
 function timeToSeconds(timeStr) {

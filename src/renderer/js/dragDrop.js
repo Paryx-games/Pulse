@@ -1,4 +1,5 @@
-class DragDropManager {
+if (!window.DragDropManager) {
+    class DragDropManager {
     constructor() {
         this.init();
     }
@@ -132,6 +133,9 @@ class DragDropManager {
             }
         }
     }
-}
+    }
 
-const dragDropManager = new DragDropManager();
+    window.DragDropManager = DragDropManager;
+    const dragDropManager = new DragDropManager();
+    window.dragDropManager = dragDropManager;
+}

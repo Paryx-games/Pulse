@@ -1,4 +1,5 @@
-class PerformanceMetrics {
+if (!window.PerformanceMetrics) {
+    class PerformanceMetrics {
     constructor() {
         this.videoElement = null;
         this.startTime = Date.now();
@@ -104,7 +105,9 @@ class PerformanceMetrics {
         const secs = seconds % 60;
         return `${hours}h ${minutes}m ${secs}s`;
     }
-}
+    }
 
-const performanceMetrics = new PerformanceMetrics();
-window.performanceMetrics = performanceMetrics;
+    window.PerformanceMetrics = PerformanceMetrics;
+    const performanceMetrics = new PerformanceMetrics();
+    window.performanceMetrics = performanceMetrics;
+}

@@ -1,4 +1,5 @@
-class ScreenshotManager {
+if (!window.ScreenshotManager) {
+    class ScreenshotManager {
     constructor() {
         this.videoElement = null;
         this.init();
@@ -74,6 +75,9 @@ class ScreenshotManager {
             alert('Failed to capture screenshot. Make sure FFmpeg is installed.');
         }
     }
-}
+    }
 
-const screenshotManager = new ScreenshotManager();
+    window.ScreenshotManager = ScreenshotManager;
+    const screenshotManager = new ScreenshotManager();
+    window.screenshotManager = screenshotManager;
+}

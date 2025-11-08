@@ -1,4 +1,5 @@
-class KeyboardShortcutsManager {
+if (!window.KeyboardShortcutsManager) {
+    class KeyboardShortcutsManager {
     constructor() {
         this.shortcuts = {
             'play-pause': { keys: 'Space', action: 'Toggle play/pause' },
@@ -218,6 +219,9 @@ class KeyboardShortcutsManager {
                 break;
         }
     }
-}
+    }
 
-const keyboardShortcutsManager = new KeyboardShortcutsManager();
+    window.KeyboardShortcutsManager = KeyboardShortcutsManager;
+    const keyboardShortcutsManager = new KeyboardShortcutsManager();
+    window.keyboardShortcutsManager = keyboardShortcutsManager;
+}

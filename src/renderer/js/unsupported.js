@@ -1,4 +1,5 @@
-class UnsupportedFileHandler {
+if (!window.UnsupportedFileHandler) {
+    class UnsupportedFileHandler {
     constructor() {
         this.init();
     }
@@ -109,6 +110,9 @@ class UnsupportedFileHandler {
         div.textContent = text;
         return div.innerHTML;
     }
-}
+    }
 
-const unsupportedFileHandler = new UnsupportedFileHandler();
+    window.UnsupportedFileHandler = UnsupportedFileHandler;
+    const unsupportedFileHandler = new UnsupportedFileHandler();
+    window.unsupportedFileHandler = unsupportedFileHandler;
+}

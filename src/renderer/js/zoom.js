@@ -1,4 +1,5 @@
-class ZoomPanManager {
+if (!window.ZoomPanManager) {
+    class ZoomPanManager {
     constructor() {
         this.videoElement = null;
         this.zoomLevel = 1;
@@ -110,6 +111,9 @@ class ZoomPanManager {
         this.videoElement.style.transform = `scale(${this.zoomLevel}) translate(${this.panX}px, ${this.panY}px)`;
         this.videoElement.style.transformOrigin = 'center center';
     }
-}
+    }
 
-const zoomPanManager = new ZoomPanManager();
+    window.ZoomPanManager = ZoomPanManager;
+    const zoomPanManager = new ZoomPanManager();
+    window.zoomPanManager = zoomPanManager;
+}

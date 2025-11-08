@@ -1,4 +1,5 @@
-class PlaybackProfileManager {
+if (!window.PlaybackProfileManager) {
+    class PlaybackProfileManager {
     constructor() {
         this.currentProfile = null;
         this.init();
@@ -159,6 +160,9 @@ class PlaybackProfileManager {
             console.error('Failed to load profile list:', error);
         }
     }
-}
+    }
 
-const playbackProfileManager = new PlaybackProfileManager();
+    window.PlaybackProfileManager = PlaybackProfileManager;
+    const playbackProfileManager = new PlaybackProfileManager();
+    window.playbackProfileManager = playbackProfileManager;
+}

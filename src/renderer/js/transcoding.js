@@ -1,4 +1,5 @@
-class TranscodingManager {
+if (!window.TranscodingManager) {
+    class TranscodingManager {
     constructor() {
         this.queue = [];
         this.isProcessing = false;
@@ -196,6 +197,9 @@ class TranscodingManager {
         div.textContent = text;
         return div.innerHTML;
     }
-}
+    }
 
-const transcodingManager = new TranscodingManager();
+    window.TranscodingManager = TranscodingManager;
+    const transcodingManager = new TranscodingManager();
+    window.transcodingManager = transcodingManager;
+}

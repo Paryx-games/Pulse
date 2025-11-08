@@ -1,8 +1,9 @@
-class SubtitleManager {
-    constructor() {
-        this.currentSubtitles = [];
-        this.subtitleElement = null;
-        this.currentSubtitleIndex = -1;
+if (!window.SubtitleManager) {
+    class SubtitleManager {
+        constructor() {
+            this.currentSubtitles = [];
+            this.subtitleElement = null;
+            this.currentSubtitleIndex = -1;
         this.subtitleTrack = null;
         this.offsetMs = 0;
         this.fontSize = 16;
@@ -315,7 +316,9 @@ class SubtitleManager {
         a.click();
         URL.revokeObjectURL(url);
     }
-}
+    }
 
-const subtitleManager = new SubtitleManager();
-window.subtitleManager = subtitleManager;
+    window.SubtitleManager = SubtitleManager;
+    const subtitleManager = new SubtitleManager();
+    window.subtitleManager = subtitleManager;
+}

@@ -1,23 +1,24 @@
-class SettingsManager {
-    constructor() {
-        this.defaults = {
-            theme: 'dark',
-            accentColor: '#a855f7',
-            controlStyle: 'modern',
-            autoHideControls: true,
-            controlOpacity: 0.8,
-            backdropBlur: true,
-            overlayBlur: 1.0,
-            animationsEnabled: true,
-            uiDensity: 'comfortable', // compact, comfortable, spacious
+if (!window.SettingsManager) {
+    class SettingsManager {
+        constructor() {
+            this.defaults = {
+                theme: 'dark',
+                accentColor: '#a855f7',
+                controlStyle: 'modern',
+                autoHideControls: true,
+                controlOpacity: 0.8,
+                backdropBlur: true,
+                overlayBlur: 1.0,
+                animationsEnabled: true,
+                uiDensity: 'comfortable', // compact, comfortable, spacious
 
-            defaultVolume: 70,
-            rememberPosition: true,
-            autoPlay: false,
-            smoothSeeking: true,
+                defaultVolume: 70,
+                rememberPosition: true,
+                autoPlay: false,
+                smoothSeeking: true,
 
-            doubleClickAction: 'fullscreen',
-            mouseWheelAction: 'volume',
+                doubleClickAction: 'fullscreen',
+                mouseWheelAction: 'volume',
             showTooltips: true,
             tooltipPosition: 'smart', // smart, above, below
 
@@ -283,18 +284,22 @@ class SettingsManager {
         const b = Math.max(0, (num % 256) - percent);
         return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
     }
+    }
+
+    window.SettingsManager = SettingsManager;
+    window.settingsManager = new SettingsManager();
 }
 
-window.settingsManager = new SettingsManager();
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+if (window.settingsManager) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            window.settingsManager.applySettings();
+            window.settingsManager.updateUI();
+            window.settingsManager.setupEventListeners();
+        });
+    } else {
         window.settingsManager.applySettings();
         window.settingsManager.updateUI();
         window.settingsManager.setupEventListeners();
-    });
-} else {
-    window.settingsManager.applySettings();
-    window.settingsManager.updateUI();
-    window.settingsManager.setupEventListeners();
+    }
 }

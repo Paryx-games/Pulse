@@ -1,10 +1,11 @@
-class Database {
-    constructor() {
-        this.dbName = 'PulseMediaDB';
-        this.version = 1;
-        this.db = null;
-        this.initDB();
-    }
+if (!window.Database) {
+    class Database {
+        constructor() {
+            this.dbName = 'PulseMediaDB';
+            this.version = 1;
+            this.db = null;
+            this.initDB();
+        }
 
     initDB() {
         return new Promise((resolve, reject) => {
@@ -363,7 +364,9 @@ class Database {
             request.onerror = () => reject(request.error);
         });
     }
+    }
+    
+    const database = new Database();
+    window.Database = Database;
+    window.database = database;
 }
-
-const database = new Database();
-window.database = database;

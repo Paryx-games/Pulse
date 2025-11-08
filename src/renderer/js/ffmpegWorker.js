@@ -1,5 +1,8 @@
-let ffmpeg;
-let ffmpegReady = false;
+if (!window.ffmpegWorkerInitialized) {
+    window.ffmpegWorkerInitialized = true;
+    
+    let ffmpeg;
+    let ffmpegReady = false;
 
 async function initFFmpeg() {
     if (ffmpegReady) return;
@@ -55,7 +58,8 @@ async function convertVideo(inputData, inputName, outputName = 'output.mp4') {
     }
 }
 
-window.FFmpegWorker = {
-    initFFmpeg,
-    convertVideo
-};
+    window.FFmpegWorker = {
+        initFFmpeg,
+        convertVideo
+    };
+}

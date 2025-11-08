@@ -1,4 +1,5 @@
-class FFmpegSettingsManager {
+if (!window.FFmpegSettingsManager) {
+    class FFmpegSettingsManager {
     constructor() {
         this.init();
     }
@@ -118,6 +119,9 @@ class FFmpegSettingsManager {
             hardwareAccel: document.getElementById('ffmpeg-hardware-accel')?.checked || false
         };
     }
-}
+    }
 
-const ffmpegSettingsManager = new FFmpegSettingsManager();
+    window.FFmpegSettingsManager = FFmpegSettingsManager;
+    const ffmpegSettingsManager = new FFmpegSettingsManager();
+    window.ffmpegSettingsManager = ffmpegSettingsManager;
+}

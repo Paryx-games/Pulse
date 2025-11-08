@@ -1,4 +1,5 @@
 module.exports = {
+  root: true,
   env: {
     browser: true,
     es2021: true,
@@ -6,21 +7,26 @@ module.exports = {
     commonjs: true
   },
   extends: [
-    'eslint:recommended'
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended'
   ],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
-    sourceType: 'module'
+    sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true
+    }
   },
   rules: {
-    'no-unused-vars': 'warn',
-    'no-console': 'off'
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    'no-console': 'off',
+    '@typescript-eslint/no-explicit-any': 'warn'
   },
   overrides: [
     {
       files: [
-        'src/main.js',
-        'src/electron.js',
         'src/main/**/*.js',
         'src/main/**/*.ts'
       ],

@@ -4,43 +4,46 @@ function sanitizeNumber(val) {
     return String(n);
 }
 
+function safeGetElement(id) {
+    return document.getElementById(id);
+}
+
 if (!window.playerInitialized) {
     window.playerInitialized = true;
 
-
-    const videoPlayer = document.getElementById('video-player');
-    const playBtn = document.getElementById('play-btn');
-    const stopBtn = document.getElementById('stop-btn');
-    const rewindBtn = document.getElementById('rewind-btn');
-    const forwardBtn = document.getElementById('forward-btn');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const openFileBtn = document.getElementById('open-file-btn');
-    const progressBar = document.getElementById('progress-bar');
-    const currentTimeDisplay = document.getElementById('current-time');
-    const totalTimeDisplay = document.getElementById('total-time');
-    const volumeSlider = document.getElementById('volume-slider');
-    const volumeBtn = document.getElementById('volume-btn');
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
-    const playlistBtn = document.getElementById('playlist-btn');
-    const pipBtn = document.getElementById('pip-btn');
-    const settingsBtn = document.getElementById('settings-btn');
-    const infoBtn = document.getElementById('info-btn');
-    const fileInput = document.getElementById('file-input');
-    const centerPlayBtn = document.getElementById('center-play-btn');
-    const loopBtn = document.getElementById('loop-btn');
-    const shuffleBtn = document.getElementById('shuffle-btn');
-    const speedBtn = document.getElementById('speed-btn');
-    const playlistSidebar = document.getElementById('playlist-sidebar');
-    const closePlaylistBtn = document.getElementById('close-playlist-btn');
-    const settingsModal = document.getElementById('settings-modal');
-    const infoModal = document.getElementById('info-modal');
-    const settingsCloseBtn = document.getElementById('settings-close-btn');
-    const infoCloseBtn = document.getElementById('info-close-btn');
-    const loadingState = document.getElementById('loading-state');
-    const emptyState = document.getElementById('empty-state');
-    const emptyLoadBtn = document.getElementById('empty-load-btn');
-    const fileName = document.getElementById('file-name');
+    const videoPlayer = safeGetElement('video-player');
+    const playBtn = safeGetElement('play-btn');
+    const stopBtn = safeGetElement('stop-btn');
+    const rewindBtn = safeGetElement('rewind-btn');
+    const forwardBtn = safeGetElement('forward-btn');
+    const prevBtn = safeGetElement('prev-btn');
+    const nextBtn = safeGetElement('next-btn');
+    const openFileBtn = safeGetElement('open-file-btn');
+    const progressBar = safeGetElement('progress-bar');
+    const currentTimeDisplay = safeGetElement('current-time');
+    const totalTimeDisplay = safeGetElement('total-time');
+    const volumeSlider = safeGetElement('volume-slider');
+    const volumeBtn = safeGetElement('volume-btn');
+    const fullscreenBtn = safeGetElement('fullscreen-btn');
+    const playlistBtn = safeGetElement('playlist-btn');
+    const pipBtn = safeGetElement('pip-btn');
+    const settingsBtn = safeGetElement('settings-btn');
+    const infoBtn = safeGetElement('info-btn');
+    const fileInput = safeGetElement('file-input');
+    const centerPlayBtn = safeGetElement('center-play-btn');
+    const loopBtn = safeGetElement('loop-btn');
+    const shuffleBtn = safeGetElement('shuffle-btn');
+    const speedBtn = safeGetElement('speed-btn');
+    const playlistSidebar = safeGetElement('playlist-sidebar');
+    const closePlaylistBtn = safeGetElement('close-playlist-btn');
+    const settingsModal = safeGetElement('settings-modal');
+    const infoModal = safeGetElement('info-modal');
+    const settingsCloseBtn = safeGetElement('settings-close-btn');
+    const infoCloseBtn = safeGetElement('info-close-btn');
+    const loadingState = safeGetElement('loading-state');
+    const emptyState = safeGetElement('empty-state');
+    const emptyLoadBtn = safeGetElement('empty-load-btn');
+    const fileName = safeGetElement('file-name');
     const playerWrapper = document.querySelector('.player-wrapper');
     const infoBar = document.querySelector('.info-bar');
     const playbackControls = document.querySelector('.playback-controls');
@@ -85,58 +88,62 @@ if (!window.playerInitialized) {
 
 
     function setupEventListeners() {
-        playBtn.addEventListener('click', togglePlayPause);
-        centerPlayBtn.addEventListener('click', togglePlayPause);
-        videoPlayer.addEventListener('dblclick', handleDoublClick);
+        if (playBtn) playBtn.addEventListener('click', togglePlayPause);
+        if (centerPlayBtn) centerPlayBtn.addEventListener('click', togglePlayPause);
+        if (videoPlayer) videoPlayer.addEventListener('dblclick', handleDoublClick);
 
-        stopBtn.addEventListener('click', stopVideo);
+        if (stopBtn) stopBtn.addEventListener('click', stopVideo);
 
-        rewindBtn.addEventListener('click', skipBackward);
-        forwardBtn.addEventListener('click', skipForward);
+        if (rewindBtn) rewindBtn.addEventListener('click', skipBackward);
+        if (forwardBtn) forwardBtn.addEventListener('click', skipForward);
 
-        prevBtn.addEventListener('click', playPrevious);
-        nextBtn.addEventListener('click', playNext);
+        if (prevBtn) prevBtn.addEventListener('click', playPrevious);
+        if (nextBtn) nextBtn.addEventListener('click', playNext);
 
-        openFileBtn.addEventListener('click', () => fileInput.click());
-        emptyLoadBtn.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', handleFileSelect);
+        if (openFileBtn) openFileBtn.addEventListener('click', () => fileInput.click());
+        if (emptyLoadBtn) emptyLoadBtn.addEventListener('click', () => fileInput.click());
+        if (fileInput) fileInput.addEventListener('change', handleFileSelect);
 
-        progressBar.addEventListener('input', seekVideo);
+        if (progressBar) progressBar.addEventListener('input', seekVideo);
 
-        volumeSlider.addEventListener('input', updateVolume);
-        volumeBtn.addEventListener('click', toggleMute);
+        if (volumeSlider) volumeSlider.addEventListener('input', updateVolume);
+        if (volumeBtn) volumeBtn.addEventListener('click', toggleMute);
 
-        videoPlayer.addEventListener('timeupdate', updateProgress);
-        videoPlayer.addEventListener('loadedmetadata', updateTotalTime);
-        videoPlayer.addEventListener('play', () => {
-            isPlaying = true;
-            updatePlayButtonState();
-        });
-        videoPlayer.addEventListener('pause', () => {
-            isPlaying = false;
-            updatePlayButtonState();
-        });
-        videoPlayer.addEventListener('ended', handleVideoEnd);
+        if (videoPlayer) {
+            videoPlayer.addEventListener('timeupdate', updateProgress);
+            videoPlayer.addEventListener('loadedmetadata', updateTotalTime);
+            videoPlayer.addEventListener('play', () => {
+                isPlaying = true;
+                updatePlayButtonState();
+            });
+            videoPlayer.addEventListener('pause', () => {
+                isPlaying = false;
+                updatePlayButtonState();
+            });
+            videoPlayer.addEventListener('ended', handleVideoEnd);
+        }
 
-        fullscreenBtn.addEventListener('click', toggleFullscreen);
-        pipBtn.addEventListener('click', togglePictureInPicture);
+        if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
+        if (pipBtn) pipBtn.addEventListener('click', togglePictureInPicture);
 
-        playlistBtn.addEventListener('click', togglePlaylist);
-        closePlaylistBtn.addEventListener('click', () => playlistSidebar.classList.remove('active'));
+        if (playlistBtn) playlistBtn.addEventListener('click', togglePlaylist);
+        if (closePlaylistBtn) closePlaylistBtn.addEventListener('click', () => playlistSidebar?.classList.remove('active'));
         
-        document.addEventListener('click', (e) => {
-            if (playlistSidebar.classList.contains('active') && 
-                !playlistSidebar.contains(e.target) && 
-                e.target !== playlistBtn && 
-                !playlistBtn.contains(e.target)) {
-                playlistSidebar.classList.remove('active');
-            }
-        });
+        if (playlistSidebar && playlistBtn) {
+            document.addEventListener('click', (e) => {
+                if (playlistSidebar.classList.contains('active') && 
+                    !playlistSidebar.contains(e.target) && 
+                    e.target !== playlistBtn && 
+                    !playlistBtn.contains(e.target)) {
+                    playlistSidebar.classList.remove('active');
+                }
+            });
+        }
 
-        shuffleBtn.addEventListener('click', toggleShuffle);
+        if (shuffleBtn) shuffleBtn.addEventListener('click', toggleShuffle);
 
-        settingsBtn.addEventListener('click', openSettings);
-        settingsCloseBtn.addEventListener('click', closeSettings);
+        if (settingsBtn) settingsBtn.addEventListener('click', openSettings);
+        if (settingsCloseBtn) settingsCloseBtn.addEventListener('click', closeSettings);
 
         document.querySelectorAll('.settings-tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -148,21 +155,23 @@ if (!window.playerInitialized) {
             });
         });
 
-        infoBtn.addEventListener('click', openInfo);
-        infoCloseBtn.addEventListener('click', closeInfo);
+        if (infoBtn) infoBtn.addEventListener('click', openInfo);
+        if (infoCloseBtn) infoCloseBtn.addEventListener('click', closeInfo);
 
-        loopBtn.addEventListener('click', toggleLoop);
+        if (loopBtn) loopBtn.addEventListener('click', toggleLoop);
 
-        speedBtn.addEventListener('click', changeSpeed);
+        if (speedBtn) speedBtn.addEventListener('click', changeSpeed);
 
         setupMoreOptionsMenu();
         setupContextMenu();
 
         document.addEventListener('keydown', handleKeyboard);
 
-        playerWrapper.addEventListener('dragover', handleDragOver);
-        playerWrapper.addEventListener('dragleave', handleDragLeave);
-        playerWrapper.addEventListener('drop', handleDrop);
+        if (playerWrapper) {
+            playerWrapper.addEventListener('dragover', handleDragOver);
+            playerWrapper.addEventListener('dragleave', handleDragLeave);
+            playerWrapper.addEventListener('drop', handleDrop);
+        }
 
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', (e) => {

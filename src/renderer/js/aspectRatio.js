@@ -1,8 +1,9 @@
-class AspectRatioManager {
-    constructor() {
-        this.videoElement = null;
-        this.currentAspectRatio = 'auto';
-        this.init();
+if (!window.AspectRatioManager) {
+    class AspectRatioManager {
+        constructor() {
+            this.videoElement = null;
+            this.currentAspectRatio = 'auto';
+            this.init();
     }
 
     init() {
@@ -180,6 +181,9 @@ class AspectRatioManager {
         const select = document.getElementById('aspect-ratio-select');
         if (select) select.value = ratio;
     }
-}
+    }
 
-const aspectRatioManager = new AspectRatioManager();
+    window.AspectRatioManager = AspectRatioManager;
+    const aspectRatioManager = new AspectRatioManager();
+    window.aspectRatioManager = aspectRatioManager;
+}

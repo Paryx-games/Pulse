@@ -1,8 +1,9 @@
-class AudioTrackManager {
-    constructor() {
-        this.audioTracks = [];
-        this.currentTrack = 0;
-        this.videoElement = null;
+if (!window.AudioTrackManager) {
+    class AudioTrackManager {
+        constructor() {
+            this.audioTracks = [];
+            this.currentTrack = 0;
+            this.videoElement = null;
         this.init();
     }
 
@@ -170,7 +171,9 @@ class AudioTrackManager {
             }
         }
     }
-}
+    }
 
-const audioTrackManager = new AudioTrackManager();
-window.audioTrackManager = audioTrackManager;
+    window.AudioTrackManager = AudioTrackManager;
+    const audioTrackManager = new AudioTrackManager();
+    window.audioTrackManager = audioTrackManager;
+}

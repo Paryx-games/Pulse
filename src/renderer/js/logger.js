@@ -1,24 +1,25 @@
-class Logger {
-    constructor() {
-        this.logs = [];
-        this.maxLogs = 500;
-        this.logLevel = 'INFO';
-        this.enableFileLogging = true;
-        this.showTimestamps = true;
-        this.logDisplay = null;
+if (!window.Logger) {
+    class Logger {
+        constructor() {
+            this.logs = [];
+            this.maxLogs = 500;
+            this.logLevel = 'INFO';
+            this.enableFileLogging = true;
+            this.showTimestamps = true;
+            this.logDisplay = null;
 
-        const levels = ['TRACE', 'DEBUG', 'INFO', 'WARNING', 'ERROR'];
-        this.levelIndex = {
-            'TRACE': 0,
-            'DEBUG': 1,
-            'INFO': 2,
-            'WARNING': 3,
-            'ERROR': 4
-        };
+            const levels = ['TRACE', 'DEBUG', 'INFO', 'WARNING', 'ERROR'];
+            this.levelIndex = {
+                'TRACE': 0,
+                'DEBUG': 1,
+                'INFO': 2,
+                'WARNING': 3,
+                'ERROR': 4
+            };
 
-        window.logger = this;
-        this.init();
-    }
+            window.logger = this;
+            this.init();
+        }
 
     init() {
         this.info('Logger initialized');
@@ -155,8 +156,10 @@ class Logger {
     getLevelIndex(level) {
         return this.levelIndex[level] || this.levelIndex['INFO'];
     }
-}
-
-if (!window.logger) {
-    window.logger = new Logger();
+    }
+    
+    window.Logger = Logger;
+    if (!window.logger) {
+        window.logger = new Logger();
+    }
 }

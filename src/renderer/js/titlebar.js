@@ -3,19 +3,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const maximizeBtn = document.getElementById('maximize-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    minimizeBtn.addEventListener('click', () => {
-        window.electronAPI.minimizeWindow();
-    });
+    if (minimizeBtn) {
+        minimizeBtn.addEventListener('click', () => {
+            window.electronAPI.minimizeWindow();
+        });
+    }
 
-    maximizeBtn.addEventListener('click', () => {
-        window.electronAPI.maximizeWindow();
-    });
+    if (maximizeBtn) {
+        maximizeBtn.addEventListener('click', () => {
+            window.electronAPI.maximizeWindow();
+        });
+    }
 
-    closeBtn.addEventListener('click', () => {
-        window.electronAPI.closeWindow();
-    });
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            window.electronAPI.closeWindow();
+        });
+    }
 
-    document.querySelector('.app-title').addEventListener('dblclick', () => {
-        window.electronAPI.maximizeWindow();
-    });
+    const titleElement = document.querySelector('.app-title') || document.querySelector('#file-name');
+    if (titleElement) {
+        titleElement.addEventListener('dblclick', () => {
+            window.electronAPI.maximizeWindow();
+        });
+    }
 });
