@@ -37,6 +37,7 @@
         "electron": "^39.1.1",
         "electron-builder": "^26.0.12",
         "eslint": "^8.54.0",
+        "patch-package": "^8.0.0",
         "husky": "^8.0.3",
         "rimraf": "^6.1.0",
         "terser": "^5.44.1",
