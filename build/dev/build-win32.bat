@@ -1,7 +1,7 @@
 @echo off
 echo DEV BUILD
 echo Building Pulse Media...
-npx electron-packager ../ "Pulse Media" --platform=win32 --arch=x64 --icon=../assets/icon/pulse.ico --out=../dist --overwrite || (
+npx electron-builder --win portable --x64 --config ../../electron-builder.json || (
     echo.
     echo Build failed!
     pause
