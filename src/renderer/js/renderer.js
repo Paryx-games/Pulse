@@ -51,6 +51,7 @@ if (!window.playerInitialized) {
 
     let playlist = [];
     let currentIndex = 0;
+    let currentItem = null;
     let isPlaying = false;
     let isLooping = false;
     let isShuffle = false;
@@ -459,21 +460,21 @@ if (!window.playerInitialized) {
     function loadPlaylistItem(index) {
         if (index < 0 || index >= playlist.length) return;
         currentIndex = index;
-        const item = playlist[index];
-        videoPlayer.src = item.url;
-        fileName.textContent = item.name;
-        window.logger.info(`Loading: ${item.name}`);
+        currentItem = playlist[index];
+        videoPlayer.src = currentItem.url;
+        fileName.textContent = currentItem.name;
+        window.logger.info(`Loading: ${currentItem.name}`);
         updatePlaylistUI();
         updateControlsVisibility();
         
         if (window.bookmarkManager) {
-            window.bookmarkManager.loadBookmarks(item.url);
+            window.bookmarkManager.loadBookmarks(currentItem.url);
         }
         if (window.audioTrackManager) {
-            window.audioTrackManager.loadAudioTracks(item.url);
+            window.audioTrackManager.loadAudioTracks(currentItem.url);
         }
         if (window.database) {
-            window.database.getMetadata(item.url);
+            window.database.getMetadata(currentItem.url);
         }
         
         videoPlayer.play().catch(() => { });
@@ -581,7 +582,7 @@ if (!window.playerInitialized) {
         grid.className = 'info-grid';
 
         const infoData = [
-            { label: 'File Name', value: fileName.textContent },
+            { label: 'File Name', value: currentItem ? currentItem.name : 'Unknown' },
             { label: 'Duration', value: formatTime(videoPlayer.duration) },
             { label: 'Current Time', value: formatTime(videoPlayer.currentTime) },
             { label: 'Playback Speed', value: speedBtn.textContent },
@@ -1052,9 +1053,10 @@ if (!window.playerInitialized) {
     function loadFile(filePath) {
         playlist.length = 0;
         currentIndex = 0;
+        const baseName = filePath.split(/[\\/]/).pop();
+        currentItem = { name: baseName, url: filePath };
         
         if (fileName) {
-            const baseName = filePath.split(/[\\/]/).pop();
             fileName.textContent = baseName;
         }
         
