@@ -7,10 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+
       - name: Install dependencies (safe)
         run: |
           # Prefer reproducible 'npm ci'. If lockfile and package.json are out of sync, fall back to npm install to allow CI to proceed.
@@ -21,20 +23,27 @@ jobs:
           else
             npm install --prefer-offline --no-audit --no-fund
           fi
+
       - name: Run ESLint
         id: run_eslint
         continue-on-error: true
         run: |
           npx eslint . -f sarif -o eslint-results.sarif || true
+
       - name: Check for SARIF
         id: check_sarif
         run: |
-          if [ -f eslint-results.sarif ]; then echo "sarif_exists=true" >> $GITHUB_OUTPUT; else echo "sarif_exists=false" >> $GITHUB_OUTPUT; fi
+          if [ -f eslint-results.sarif ]; then
+            echo "sarif_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "sarif_exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Upload analysis results to GitHub
-      - permissions:
-        contents: read
-        security-events: write
         if: steps.check_sarif.outputs.sarif_exists == 'true'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: eslint-results.sarif
+        permissions:
+          contents: read
+          security-events: write
